@@ -1,5 +1,7 @@
 # MacOS（本机）- MySql
 
+![Jobs出品，必属精品](https://picsum.photos/1500/400)
+
 [toc]
 - [MacOS（本机）- MySql](#macos本机--mysql)
   - [1、卸载 和 删除 MySql](#1卸载-和-删除-mysql)

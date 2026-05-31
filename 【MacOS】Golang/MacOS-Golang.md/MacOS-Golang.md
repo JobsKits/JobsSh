@@ -1,5 +1,7 @@
 # MacOS 配置 Golang 环境
 
+![Jobs出品，必属精品](https://picsum.photos/1500/400)
+
 *资料来源*
 
 [简书/Mac安装Golang和vscode](https://www.jianshu.com/p/7f9f73327fd8)

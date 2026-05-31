@@ -1,5 +1,7 @@
 # 利用 Golang 向 Mysql 数据库 增/删/改 数据
 
+![Jobs出品，必属精品](https://picsum.photos/1500/400)
+
 [toc]
 
 - [利用 Golang 向 Mysql 数据库 增/删/改 数据](#利用-golang-向-mysql-数据库-增删改-数据)

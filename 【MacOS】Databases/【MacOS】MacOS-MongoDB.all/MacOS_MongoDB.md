@@ -1,5 +1,7 @@
 # MacOS 平台上 关于芒果🥭数据库
 
+![Jobs出品，必属精品](https://picsum.photos/1500/400)
+
 [toc]
 - [MacOS 平台上 关于芒果🥭数据库](#macos-平台上-关于芒果数据库)
   - [1、MacOS\_MongoDB](#1macos_mongodb)
