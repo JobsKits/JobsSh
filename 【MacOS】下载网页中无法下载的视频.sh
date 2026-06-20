@@ -1,3 +1,5 @@
+# 收拢旧脚本原有执行顺序，后续复杂职责可继续拆分。
+run_main_flow() {
 # 检查安装 brew
 if ! command -v brew &> /dev/null
 then
@@ -26,3 +28,12 @@ fi
 
 read -p "请输入视频源,以回车结束:" videoSource
 You-get $videoSource
+}
+
+# 统一收口脚本入口，仅委托已经拆分完成的业务流程。
+main() {
+  # 主入口只负责委托完整业务流程，复杂逻辑统一下沉。
+  run_main_flow "$@"
+}
+
+main "$@"

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 收拢旧脚本原有执行顺序，后续复杂职责可继续拆分。
+run_main_flow() {
+
 # 检测是否已经安装了brew
 if ! command -v brew &> /dev/null
 then
@@ -195,3 +198,12 @@ dependenceConf # ②下载本脚本文件头部配置的依赖。依赖下载完
 
 localGoEnvInfo # 生成一些配置说明文件
 GOPATHConf # GOPATH 配置
+}
+
+# 统一收口脚本入口，仅委托已经拆分完成的业务流程。
+main() {
+  # 主入口只负责委托完整业务流程，复杂逻辑统一下沉。
+  run_main_flow "$@"
+}
+
+main "$@"

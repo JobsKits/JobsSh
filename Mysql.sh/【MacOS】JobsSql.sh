@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 收拢旧脚本原有执行顺序，后续复杂职责可继续拆分。
+run_main_flow() {
+
 # 如果没有执行权限，在这个sh文件的目录下，执行chmod u+x *.sh
 filePath=$(dirname $0)/$(basename $0)
 echo "我在这里：$filePath" 
@@ -53,3 +56,12 @@ lsof -nP -i | grep mysql
 
 echo "进入root用户（无密码）"
 mysql -uroot -p
+}
+
+# 统一收口脚本入口，仅委托已经拆分完成的业务流程。
+main() {
+  # 主入口只负责委托完整业务流程，复杂逻辑统一下沉。
+  run_main_flow "$@"
+}
+
+main "$@"

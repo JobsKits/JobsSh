@@ -1,3 +1,5 @@
+# 收拢旧脚本原有执行顺序，后续复杂职责可继续拆分。
+run_main_flow() {
 # !/bin/bash
 
 echo '关闭本机通过 brew 方式安装的 MySql 服务'
@@ -31,4 +33,13 @@ code /etc/my.cnf
 brew services restart mysql 
 
 echo "不需要验证密码，直接登录 mysql"
-mysql -p   
+mysql -p
+}
+
+# 统一收口脚本入口，仅委托已经拆分完成的业务流程。
+main() {
+  # 主入口只负责委托完整业务流程，复杂逻辑统一下沉。
+  run_main_flow "$@"
+}
+
+main "$@"

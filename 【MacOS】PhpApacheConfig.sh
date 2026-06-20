@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 收拢旧脚本原有执行顺序，后续复杂职责可继续拆分。
+run_main_flow() {
+
 # 参考资料
 ## https://getgrav.org/blog/macos-monterey-apache-multiple-php-versions
 ## https://www.cnblogs.com/ice5/p/15783811.html
@@ -63,3 +66,12 @@ vim /opt/homebrew/etc/httpd/httpd.conf
 
 Listen 8080 更改为 Listen 80
 
+}
+
+# 统一收口脚本入口，仅委托已经拆分完成的业务流程。
+main() {
+  # 主入口只负责委托完整业务流程，复杂逻辑统一下沉。
+  run_main_flow "$@"
+}
+
+main "$@"

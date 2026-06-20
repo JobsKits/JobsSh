@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 收拢旧脚本原有执行顺序，后续复杂职责可继续拆分。
+run_main_flow() {
+
 <<'COMMENT'
 在MacOS平台上，用shell脚本，实现对java环境JDK的一键配置。包括如下细节：
 
@@ -97,3 +100,12 @@ echo "export PATH=\$PATH:\$JAVA_HOME/bin" >> ~/.bash_profile
 source ~/.bash_profile
 ## 在TextEdit中打开环境变量文件
 open ~/.bash_profile
+}
+
+# 统一收口脚本入口，仅委托已经拆分完成的业务流程。
+main() {
+  # 主入口只负责委托完整业务流程，复杂逻辑统一下沉。
+  run_main_flow "$@"
+}
+
+main "$@"

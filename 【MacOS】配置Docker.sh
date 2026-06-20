@@ -1,5 +1,8 @@
 #! /bin/sh
 
+# 收拢旧脚本原有执行顺序，后续复杂职责可继续拆分。
+run_main_flow() {
+
 open -a "/Applications/Safari.app" https://docs.docker.com/desktop/mac/install/
 
 brew install --cask --appdir=/Applications docker
@@ -13,3 +16,12 @@ brew install --cask --appdir=/Applications docker
 docker --version
 # 查看是否配置成功
 docker info
+}
+
+# 统一收口脚本入口，仅委托已经拆分完成的业务流程。
+main() {
+  # 主入口只负责委托完整业务流程，复杂逻辑统一下沉。
+  run_main_flow "$@"
+}
+
+main "$@"

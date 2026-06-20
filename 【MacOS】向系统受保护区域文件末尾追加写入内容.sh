@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 收拢旧脚本原有执行顺序，后续复杂职责可继续拆分。
+run_main_flow() {
+
 <<'COMMENT'
     # 📌定位到桌面
     cd Desktop/
@@ -49,3 +52,12 @@ EOF
 
 ## 写成功了以后，拷贝回原路径
 cp $fileCopy_fullname $filePath
+}
+
+# 统一收口脚本入口，仅委托已经拆分完成的业务流程。
+main() {
+  # 主入口只负责委托完整业务流程，复杂逻辑统一下沉。
+  run_main_flow "$@"
+}
+
+main "$@"
