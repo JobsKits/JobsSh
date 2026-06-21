@@ -1,42 +1,43 @@
 #!/bin/bash
-
-# 收拢旧脚本原有执行顺序，后续复杂职责可继续拆分。
-run_main_flow() {
-
+# 脚本自述：
+# - 脚本名称：【MacOS】GoProject.sh
+# - 核心用途：执行“GoProject”对应的自动化任务。
+# - 影响范围：可能修改当前项目、用户环境或脚本指定的目标。
+# - 运行提示：运行后会先打印内置自述；终端模式按回车确认后继续，按 Ctrl+C 可取消。
+# 打印脚本内置自述，并按运行入口决定是否等待用户确认。
+show_script_intro_and_wait() {
+  print -r -- '============================== 脚本内置自述 =============================='
+  print -r -- '脚本名称：【MacOS】GoProject.sh'
+  print -r -- '核心用途：执行“GoProject”对应的自动化任务。'
+  print -r -- '影响范围：可能修改当前项目、用户环境或脚本指定的目标。'
+  print -r -- '取消方式：确认前按 Ctrl+C 终止，不会继续执行后续业务。'
+  print -r -- '============================================================================'
+  if [[ ! -t 0 ]]; then
+    print -u2 -r -- '当前没有可交互输入，请在终端中重新运行。'
+    return 1
+  fi
+  read -r "?👉 已了解脚本用途与影响，按回车继续；按 Ctrl+C 取消：" _
+}
+# 执行入口下沉后的完整业务流程和控制逻辑。
 # 检测是否已经安装了brew
-if ! command -v brew &> /dev/null
-then
-    echo "brew 未安装，开始安装..."
-    open https://brew.sh/
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    ## brew环境变量设置
-    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/$(whoami)/.zprofile
-    open /Users/$(whoami)/.zprofile
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-else
-    echo "brew 已经安装，跳过安装步骤。"
-    ## brew 升级
-    brew update
-    brew doctor
-    brew -v
-fi
-
 # 🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛
 ## 如果没有执行权限，在这个sh文件的目录下，执行chmod u+x *.sh
 ## 加执行权限
 function addExe(){
     
     filePath=$(dirname $0)/$(basename $0)
+    # 输出当前步骤的提示或执行进度。
     echo "我在这里：$filePath" 
 
     # 定位📌于该文件的垂直文件夹
     folderPath=$(dirname $0)
+    # 执行当前流程中的独立业务步骤：cd。
     cd folderPath
     # 加权限
     fileFullName=$(basename $0)
+    # 执行当前流程中的独立业务步骤：chmod。
     chmod u+x $fileFullName
 }
-
 ## 通过 brew 安装 golong 语言环境，以及 IDE：vscode
 function sysGoConf() {
 <<'COMMENT'
@@ -56,7 +57,6 @@ COMMENT
     cd $GOPATH/src/github.com/golang
     git clone https://github.com/golang/tools.git tools
 }
-
 ## 添加默认值（字符串）
 function defaultInput() {
     result=${1}
@@ -66,20 +66,17 @@ function defaultInput() {
         result=$'Test'
     fi  
 }
-
 ## 配置项目依赖
 function dependenceConf(){
     go get github.com/go-sql-driver/mysql ## mysql 的go语言驱动
     go get -u -v github.com/kardianos/govendor ## 安装 govendor
     # govendor -version ## 检查 govendor 是否安装成功
 }
-
 ## 写文件内容
 function writeFileContent(){
     # Todo
     echo ''
 }
-
 ## 写入环境变量
 ## 在 ~/.bash_profile 文件内部搜索是否包含 GOPATH（全匹配：包括大小写和文字）
 function GOPATHConf(){
@@ -112,7 +109,6 @@ COMMENT
         source ~/.zshrc
     fi
 }
-
 ## 生成一些配置说明文件
 function localGoEnvInfo(){
     ### 先清空
@@ -124,7 +120,6 @@ function localGoEnvInfo(){
     sed 's/:/\n/g' <<< "$PATH" >> localGoEnvInfo.md
     open localGoEnvInfo.md
 }
-
 ## 项目初始化
 function projInit(){
     # 📌定位到桌面
@@ -156,32 +151,53 @@ COMMENT
 
 # 🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛
 
-projInit # 项目初始化
 
 # 读取键盘输入，回车结束监听记录
-echo "【温馨提示：如果什么都没有输入，那么启用默认文件名Test】"
-read -p "请输入新建文件名字，以回车结束:" file_name
 
-defaultInput $file_name
 file_name=${result}
 # echo "The value of var is ${result}"
 
 # 新建一个文件，命名为Test
 file_name=$file_name$".go"
-Touch $file_name
-
-echo ${file_name}
-
 # writeFileContent ${file_name} # 写内容到文件
-
-cat>${file_name}<<EOF
-
+# 编排脚本的高层业务流程。
+# 初始化脚本运行环境，并集中承载原有的顶层执行逻辑。
+run_main_business_flow() {
+  if ! command -v brew &> /dev/null
+  then
+      # 输出当前步骤的提示或执行进度。
+      echo "brew 未安装，开始安装..."
+      # 执行当前流程中的独立业务步骤：open。
+      open https://brew.sh/
+      # 执行当前流程中的独立业务步骤：处理当前语句。
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      ## brew环境变量设置
+      echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/$(whoami)/.zprofile
+      # 执行当前流程中的独立业务步骤：open。
+      open /Users/$(whoami)/.zprofile
+      # 执行当前流程中的独立业务步骤：eval。
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+  else
+      # 输出当前步骤的提示或执行进度。
+      echo "brew 已经安装，跳过安装步骤。"
+      ## brew 升级
+      brew update
+      # 执行当前流程中的独立业务步骤：brew。
+      brew doctor
+      # 执行当前流程中的独立业务步骤：brew。
+      brew -v
+  fi
+  projInit # 项目初始化
+  echo "【温馨提示：如果什么都没有输入，那么启用默认文件名Test】"
+  read -p "请输入新建文件名字，以回车结束:" file_name
+  defaultInput $file_name
+  Touch $file_name
+  echo ${file_name}
+  cat>${file_name}<<EOF
 package main
-
 import (
     "github.com/gin-gonic/gin"
 )
-
 func main() {
     r := gin.Default()
     r.GET("/ping", func(c *gin.Context) {
@@ -192,18 +208,16 @@ func main() {
     r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 EOF
-
-go run $file_name # ①下载写入内容的依赖。依赖下载完成，会生成go.sum文件
-dependenceConf # ②下载本脚本文件头部配置的依赖。依赖下载完成，会生成go.sum文件
-
-localGoEnvInfo # 生成一些配置说明文件
-GOPATHConf # GOPATH 配置
+  go run $file_name # ①下载写入内容的依赖。依赖下载完成，会生成go.sum文件
+  dependenceConf # ②下载本脚本文件头部配置的依赖。依赖下载完成，会生成go.sum文件
+  localGoEnvInfo # 生成一些配置说明文件
+  GOPATHConf # GOPATH 配置
 }
-
-# 统一收口脚本入口，仅委托已经拆分完成的业务流程。
+# 编排脚本的高层业务流程。
 main() {
-  # 主入口只负责委托完整业务流程，复杂逻辑统一下沉。
-  run_main_flow "$@"
+  # 展示脚本内置自述，并按运行入口完成防误触确认。
+  show_script_intro_and_wait
+  # 执行脚本原有的完整业务流程。
+  run_main_business_flow "$@"
 }
-
 main "$@"
