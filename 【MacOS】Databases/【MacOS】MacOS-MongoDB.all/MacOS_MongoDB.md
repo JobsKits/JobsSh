@@ -116,25 +116,25 @@ To install gcollazo-mongodb ✔, run:
 ==> Downloading from https://objects.githubusercontent.com/github-production-rel
 ######################################################################### 100.0%
 ==> Uninstalling Cask gcollazo-mongodb
-==> Backing App 'MongoDB.app' up to '/opt/homebrew/Caskroom/gcollazo-mongodb/6.0
-==> Removing App '/Applications/MongoDB.app'
+==> Backing App 'MongoDB.app' up to '$(brew --prefix)/Caskroom/gcollazo-mongodb/6.0
+==> Removing App '$APPLICATIONS_DIR/MongoDB.app'
 ==> Purging files for version 6.0.0-build.1 of Cask gcollazo-mongodb
 ==> Installing Cask gcollazo-mongodb
-==> Moving App 'MongoDB.app' to '/Applications/MongoDB.app'
+==> Moving App 'MongoDB.app' to '$APPLICATIONS_DIR/MongoDB.app'
 🍺  gcollazo-mongodb was successfully installed!
 ```
 
 ```bash
 ➜  ~ brew list gcollazo-mongodb       
 ==> App
-/Applications/MongoDB.app (185 files, 224.7MB)
+$APPLICATIONS_DIR/MongoDB.app (185 files, 224.7MB)
 ```
 
 ```bash
 ➜  ~ brew info gcollazo-mongodb      
 ==> gcollazo-mongodb: 6.0.0-build.1
 https://elweb.co/mongodb-app/
-/opt/homebrew/Caskroom/gcollazo-mongodb/6.0.0-build.1 (121B)
+$(brew --prefix)/Caskroom/gcollazo-mongodb/6.0.0-build.1 (121B)
 From: https://github.com/Homebrew/homebrew-cask/blob/HEAD/Casks/gcollazo-mongodb.rb
 ==> Name
 MongoDB
@@ -189,42 +189,42 @@ Xcode can be updated from the App Store.
 ==> Installing dependencies for mongodb/brew/mongodb-community: node@16 and mongosh
 ==> Installing mongodb/brew/mongodb-community dependency: node@16
 ==> Pouring node@16--16.20.0.arm64_ventura.bottle.tar.gz
-🍺  /opt/homebrew/Cellar/node@16/16.20.0: 1,890 files, 47.5MB
+🍺  $(brew --prefix)/Cellar/node@16/16.20.0: 1,890 files, 47.5MB
 ==> Installing mongodb/brew/mongodb-community dependency: mongosh
 ==> Pouring mongosh--1.8.2.arm64_ventura.bottle.tar.gz
-🍺  /opt/homebrew/Cellar/mongosh/1.8.2: 8,228 files, 40.8MB
+🍺  $(brew --prefix)/Cellar/mongosh/1.8.2: 8,228 files, 40.8MB
 ==> Installing mongodb/brew/mongodb-community
 ==> Caveats
 To restart mongodb/brew/mongodb-community after an upgrade:
   brew services restart mongodb/brew/mongodb-community
 Or, if you don't want/need a background service you can just run:
-  /opt/homebrew/opt/mongodb-community/bin/mongod --config /opt/homebrew/etc/mongod.conf
+  $(brew --prefix)/opt/mongodb-community/bin/mongod --config $(brew --prefix)/etc/mongod.conf
 ==> Summary
-🍺  /opt/homebrew/Cellar/mongodb-community/6.0.5: 11 files, 200.5MB, built in 5 seconds
+🍺  $(brew --prefix)/Cellar/mongodb-community/6.0.5: 11 files, 200.5MB, built in 5 seconds
 ==> Running `brew cleanup mongodb-community`...
 Disable this behaviour by setting HOMEBREW_NO_INSTALL_CLEANUP.
 Hide these hints with HOMEBREW_NO_ENV_HINTS (see `man brew`).
 Warning: Calling plist_options is deprecated! Use service.require_root instead.
 Please report this issue to the elastic/tap tap (not Homebrew/brew or Homebrew/homebrew-core), or even better, submit a PR to fix it:
-  /opt/homebrew/Library/Taps/elastic/homebrew-tap/Formula/elasticsearch-full.rb:68
+  $(brew --prefix)/Library/Taps/elastic/homebrew-tap/Formula/elasticsearch-full.rb:68
 
 ==> Caveats
 ==> mongodb-community
 To restart mongodb/brew/mongodb-community after an upgrade:
   brew services restart mongodb/brew/mongodb-community
 Or, if you don't want/need a background service you can just run:
-  /opt/homebrew/opt/mongodb-community/bin/mongod --config /opt/homebrew/etc/mongod.conf
+  $(brew --prefix)/opt/mongodb-community/bin/mongod --config $(brew --prefix)/etc/mongod.conf
 ```
 
 ```bash
 ➜  ~ brew list mongodb-community                
-/opt/homebrew/Cellar/mongodb-community/6.0.5/bin/install_compass
-/opt/homebrew/Cellar/mongodb-community/6.0.5/bin/mongod
-/opt/homebrew/Cellar/mongodb-community/6.0.5/bin/mongos
-/opt/homebrew/Cellar/mongodb-community/6.0.5/homebrew.mongodb-community.service
-/opt/homebrew/Cellar/mongodb-community/6.0.5/homebrew.mxcl.mongodb-community.plist
-/opt/homebrew/Cellar/mongodb-community/6.0.5/MPL-2
-/opt/homebrew/Cellar/mongodb-community/6.0.5/THIRD-PARTY-NOTICES
+$(brew --prefix)/Cellar/mongodb-community/6.0.5/bin/install_compass
+$(brew --prefix)/Cellar/mongodb-community/6.0.5/bin/mongod
+$(brew --prefix)/Cellar/mongodb-community/6.0.5/bin/mongos
+$(brew --prefix)/Cellar/mongodb-community/6.0.5/homebrew.mongodb-community.service
+$(brew --prefix)/Cellar/mongodb-community/6.0.5/homebrew.mxcl.mongodb-community.plist
+$(brew --prefix)/Cellar/mongodb-community/6.0.5/MPL-2
+$(brew --prefix)/Cellar/mongodb-community/6.0.5/THIRD-PARTY-NOTICES
 ```
 
 ### 1.3、端口
@@ -249,7 +249,7 @@ brew install --cask mongodb-compass
 ==> Downloading https://downloads.mongodb.com/compass/mongodb-compass-1.36.4-dar
 ######################################################################### 100.0%
 ==> Installing Cask mongodb-compass
-==> Moving App 'MongoDB Compass.app' to '/Applications/MongoDB Compass.app'
+==> Moving App 'MongoDB Compass.app' to '$APPLICATIONS_DIR/MongoDB Compass.app'
 🍺  mongodb-compass was successfully installed!
 ```
 

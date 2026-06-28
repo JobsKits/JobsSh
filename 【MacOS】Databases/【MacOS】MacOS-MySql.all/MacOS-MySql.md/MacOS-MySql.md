@@ -86,16 +86,16 @@ brew cleanup
 *直接安装在 MacOS 上，清除残留*
 
 ```bash
-sudo rm /usr/local/MySQL
-sudo rm -rf /usr/local/MySQL*
-sudo rm -rf /Library/StartupItems/MySQLCOM
-sudo rm -rf /Library/PreferencePanes/My*
-edit /etc/hostconfig and remove the line MySQLCOM=-YES-
+sudo rm $(brew --prefix)/MySQL
+sudo rm -rf $(brew --prefix)/MySQL*
+sudo rm -rf $SYSTEM_LIBRARY_DIR/StartupItems/MySQLCOM
+sudo rm -rf $SYSTEM_LIBRARY_DIR/PreferencePanes/My*
+edit $SYSTEM_CONFIG_DIR/hostconfig and remove the line MySQLCOM=-YES-
 rm -rf ~/Library/PreferencePanes/My*
-sudo rm -rf /Library/Recipts/MySQL*
-sudo rm -rf /Library/Receipts/MySQL*
-sudo rm -rf /private/var/db/receipts/MySQL*
-sudo rm -rf /var/db/receipts/com.mysql.*
+sudo rm -rf $SYSTEM_LIBRARY_DIR/Recipts/MySQL*
+sudo rm -rf $SYSTEM_LIBRARY_DIR/Receipts/MySQL*
+sudo rm -rf $TMPDIR/db/receipts/MySQL*
+sudo rm -rf $SYSTEM_VAR_DIR/db/receipts/com.mysql.*
 ```
 
 ### 1.2、清除数据库物理实体文件
@@ -107,7 +107,7 @@ mysql> show global variables like "%datadir%" ;
 +---------------+--------------------------+
 | Variable_name | Value          |
 +---------------+--------------------------+
-| datadir    | /opt/homebrew/var/mysql/ |
+| datadir    | $(brew --prefix)/var/mysql/ |
 +---------------+--------------------------+
 
 1 row in set (0.02 sec)
@@ -116,7 +116,7 @@ mysql> show global variables like "%datadir%" ;
 *2、删除数据库物理实体文件*
 
 ```bash
-rm -r /opt/homebrew/var/mysql
+rm -r $(brew --prefix)/var/mysql
 ```
 
 ## 2、多种方式安装和管理 MySql
@@ -272,7 +272,7 @@ mysql -u root -p
 登录 root 账户
 mysql -u root -p
 返回 →
-ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/tmp/mysql.sock' (2)
+ERROR 2002 (HY000): Can't connect to local MySQL server through socket '$TMPDIR/mysql.sock' (2)
 错误原因：服务未启动。
 因为通过命令验证brew services stop mysql，返回 Warning: Service `mysql` is not started.
 
@@ -323,8 +323,8 @@ ERROR 1044 (42000): Access denied for user 'Jobs'@'localhost' to database 'go_db
 
 ```
 用 brew 管理的 mysql 有2个配置文件：
-1、brew_mysql 的配置文件`/opt/homebrew/Cellar/mysql/"8.0.32"/.bottle/etc/my.cnf`
-2、系统的 mysql 配置文件 `/etc/my.cnf`
+1、brew_mysql 的配置文件`$(brew --prefix)/Cellar/mysql/"8.0.32"/.bottle$SYSTEM_CONFIG_DIR/my.cnf`
+2、系统的 mysql 配置文件 `$SYSTEM_CONFIG_DIR/my.cnf`
 brew_mysql 的配置文件 需要映射到 系统的 mysql 配置文件 方可生效
 ```
 
@@ -336,12 +336,12 @@ brew_mysql 的配置文件 需要映射到 系统的 mysql 配置文件 方可�
 
 [MySQL服务读取参数文件my.cnf的规律研究探索](https://www.cnblogs.com/kerrycode/p/8582249.html)
 
-**如果在启动 Mysql的时候未指定 `my.cnf ` 那么他将从左至右依次去找寻` /etc/my.cnf` `/etc/mysql/my.cnf` `/opt/homebrew/etc/my.cnf ` `~/.my.cnf `**
+**如果在启动 Mysql的时候未指定 `my.cnf ` 那么他将从左至右依次去找寻` $SYSTEM_CONFIG_DIR/my.cnf` `$SYSTEM_CONFIG_DIR/mysql/my.cnf` `$(brew --prefix)/etc/my.cnf ` `~/.my.cnf `**
 
 ```bash
 ➜  ~ mysql --help | grep 'my.cnf'
                       order of preference, my.cnf, $MYSQL_TCP_PORT,
-/etc/my.cnf /etc/mysql/my.cnf /opt/homebrew/etc/my.cnf ~/.my.cnf 
+$SYSTEM_CONFIG_DIR/my.cnf $SYSTEM_CONFIG_DIR/mysql/my.cnf $(brew --prefix)/etc/my.cnf ~/.my.cnf 
 ```
 
 ### 3.2、修改 Mysql 配置文件 `my.cnf` 的脚本
@@ -349,7 +349,7 @@ brew_mysql 的配置文件 需要映射到 系统的 mysql 配置文件 方可�
 *温馨提示：先修改再运行*
 
 ```shell
-# !/bin/bash
+# shell: bash
 
 echo '关闭本机通过 brew 方式安装的 MySql 服务'
 brew services stop mysql
@@ -357,14 +357,14 @@ mysql.server stop
 
 echo '本机通过 brew 形式安装的 MySql 安装目录'
 brew list mysql
-# 不出意外，会对外输出 /opt/homebrew/Cellar/mysql
+# 不出意外，会对外输出 $(brew --prefix)/Cellar/mysql
 mysql --version
 
 read -p "请输入本机的 Mysql 版本号，以回车结束。默认8.0.32:" mysqlVersion
 if [[ $mysqlVersion = "" ]];then
     mysqlVersion="8.0.32"
 fi
-fileCopy_fullname=$"/opt/homebrew/Cellar/mysql/"${mysqlVersion}"/.bottle/etc/my.cnf"
+fileCopy_fullname=$"$(brew --prefix)/Cellar/mysql/"${mysqlVersion}"/.bottle$SYSTEM_CONFIG_DIR/my.cnf"
 echo "fileCopy_fullname:"$fileCopy_fullname
 
 # 直接追加写入
@@ -379,8 +379,8 @@ EOF
 
 code $fileCopy_fullname
 read -p "检查完毕并保存:通过brew管理的Mysql配置文件【my.cnf】" 
-sudo cp $fileCopy_fullname /etc/my.cnf
-code /etc/my.cnf
+sudo cp $fileCopy_fullname $SYSTEM_CONFIG_DIR/my.cnf
+code $SYSTEM_CONFIG_DIR/my.cnf
 brew services restart mysql 
 
 echo "不需要验证密码，直接登录 mysql"
@@ -397,7 +397,7 @@ mysql -p
 
 ```bash
 ➜  ~ whereis mysql
-mysql: /opt/homebrew/bin/mysql /opt/homebrew/share/man/man1/mysql.1
+mysql: $(brew --prefix)/bin/mysql $(brew --prefix)/share/man/man1/mysql.1
 ```
 
 ### 4.2、安装目录
@@ -405,80 +405,80 @@ mysql: /opt/homebrew/bin/mysql /opt/homebrew/share/man/man1/mysql.1
 ```bash
 ➜  ~ brew list mysql
 
-/opt/homebrew/Cellar/mysql/8.0.32/.bottle/etc/my.cnf
-/opt/homebrew/Cellar/mysql/8.0.32/bin/comp_err
-/opt/homebrew/Cellar/mysql/8.0.32/bin/ibd2sdi
-/opt/homebrew/Cellar/mysql/8.0.32/bin/innochecksum
-/opt/homebrew/Cellar/mysql/8.0.32/bin/my_print_defaults
-/opt/homebrew/Cellar/mysql/8.0.32/bin/myisam_ftdump
-/opt/homebrew/Cellar/mysql/8.0.32/bin/myisamchk
-/opt/homebrew/Cellar/mysql/8.0.32/bin/myisamlog
-/opt/homebrew/Cellar/mysql/8.0.32/bin/myisampack
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysql
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysql.server
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysql_client_test
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysql_config
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysql_config_editor
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysql_keyring_encryption_test
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysql_migrate_keyring
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysql_secure_installation
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysql_ssl_rsa_setup
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysql_tzinfo_to_sql
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysql_upgrade
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqladmin
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqlbinlog
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqlcheck
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqld
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqld_multi
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqld_safe
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqldump
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqldumpslow
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqlimport
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqlpump
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqlrouter
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqlrouter_keyring
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqlrouter_passwd
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqlrouter_plugin_info
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqlshow
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqlslap
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqltest
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqltest_safe_process
-/opt/homebrew/Cellar/mysql/8.0.32/bin/mysqlxtest
-/opt/homebrew/Cellar/mysql/8.0.32/bin/perror
-/opt/homebrew/Cellar/mysql/8.0.32/bin/zlib_decompress
-/opt/homebrew/Cellar/mysql/8.0.32/docs/sample_mysqlrouter.conf
-/opt/homebrew/Cellar/mysql/8.0.32/homebrew.mxcl.mysql.plist
-/opt/homebrew/Cellar/mysql/8.0.32/homebrew.mysql.service
-/opt/homebrew/Cellar/mysql/8.0.32/include/mysql/ (16 files)
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlclient.21.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlharness.1.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlharness_stdx.1.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlharness_tls.1.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlrouter.1.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlrouter_connection_pool.1.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlrouter_destination_status.1.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlrouter_http.1.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlrouter_http_auth_backend.1.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlrouter_http_auth_realm.1.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlrouter_io_component.1.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlrouter_metadata_cache.1.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlrouter_mysqlxmessages.1.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/libmysqlrouter_routing.1.dylib
-/opt/homebrew/Cellar/mysql/8.0.32/lib/mysqlrouter/ (16 files)
-/opt/homebrew/Cellar/mysql/8.0.32/lib/pkgconfig/mysqlclient.pc
-/opt/homebrew/Cellar/mysql/8.0.32/lib/plugin/ (116 files)
-/opt/homebrew/Cellar/mysql/8.0.32/lib/ (3 other files)
-/opt/homebrew/Cellar/mysql/8.0.32/mysqlrouter-log-rotate
-/opt/homebrew/Cellar/mysql/8.0.32/README-test
-/opt/homebrew/Cellar/mysql/8.0.32/README.router
-/opt/homebrew/Cellar/mysql/8.0.32/share/aclocal/mysql.m4
-/opt/homebrew/Cellar/mysql/8.0.32/share/doc/ (2 files)
-/opt/homebrew/Cellar/mysql/8.0.32/share/info/mysql.info
-/opt/homebrew/Cellar/mysql/8.0.32/share/man/ (35 files)
-/opt/homebrew/Cellar/mysql/8.0.32/share/mysql/ (56 files)
-/opt/homebrew/Cellar/mysql/8.0.32/support-files/ (3 files)
+$(brew --prefix)/Cellar/mysql/8.0.32/.bottle$SYSTEM_CONFIG_DIR/my.cnf
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/comp_err
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/ibd2sdi
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/innochecksum
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/my_print_defaults
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/myisam_ftdump
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/myisamchk
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/myisamlog
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/myisampack
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysql
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysql.server
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysql_client_test
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysql_config
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysql_config_editor
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysql_keyring_encryption_test
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysql_migrate_keyring
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysql_secure_installation
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysql_ssl_rsa_setup
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysql_tzinfo_to_sql
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysql_upgrade
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqladmin
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqlbinlog
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqlcheck
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqld
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqld_multi
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqld_safe
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqldump
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqldumpslow
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqlimport
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqlpump
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqlrouter
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqlrouter_keyring
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqlrouter_passwd
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqlrouter_plugin_info
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqlshow
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqlslap
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqltest
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqltest_safe_process
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/mysqlxtest
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/perror
+$(brew --prefix)/Cellar/mysql/8.0.32/bin/zlib_decompress
+$(brew --prefix)/Cellar/mysql/8.0.32/docs/sample_mysqlrouter.conf
+$(brew --prefix)/Cellar/mysql/8.0.32/homebrew.mxcl.mysql.plist
+$(brew --prefix)/Cellar/mysql/8.0.32/homebrew.mysql.service
+$(brew --prefix)/Cellar/mysql/8.0.32/include/mysql/ (16 files)
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlclient.21.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlharness.1.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlharness_stdx.1.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlharness_tls.1.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlrouter.1.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlrouter_connection_pool.1.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlrouter_destination_status.1.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlrouter_http.1.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlrouter_http_auth_backend.1.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlrouter_http_auth_realm.1.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlrouter_io_component.1.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlrouter_metadata_cache.1.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlrouter_mysqlxmessages.1.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/libmysqlrouter_routing.1.dylib
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/mysqlrouter/ (16 files)
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/pkgconfig/mysqlclient.pc
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/plugin/ (116 files)
+$(brew --prefix)/Cellar/mysql/8.0.32/lib/ (3 other files)
+$(brew --prefix)/Cellar/mysql/8.0.32/mysqlrouter-log-rotate
+$(brew --prefix)/Cellar/mysql/8.0.32/README-test
+$(brew --prefix)/Cellar/mysql/8.0.32/README.router
+$(brew --prefix)/Cellar/mysql/8.0.32/share/aclocal/mysql.m4
+$(brew --prefix)/Cellar/mysql/8.0.32/share/doc/ (2 files)
+$(brew --prefix)/Cellar/mysql/8.0.32/share/info/mysql.info
+$(brew --prefix)/Cellar/mysql/8.0.32/share/man/ (35 files)
+$(brew --prefix)/Cellar/mysql/8.0.32/share/mysql/ (56 files)
+$(brew --prefix)/Cellar/mysql/8.0.32/support-files/ (3 files)
 
-/opt/homebrew/Cellar/mysql
+$(brew --prefix)/Cellar/mysql
 ```
 
 ### 4.3、存放数据的物理文件目录
@@ -488,7 +488,7 @@ mysql> show global variables like "%datadir%" ;
 +---------------+--------------------------+
 | Variable_name | Value          |
 +---------------+--------------------------+
-| datadir    | /opt/homebrew/var/mysql/ |
+| datadir    | $(brew --prefix)/var/mysql/ |
 +---------------+--------------------------+
 
 1 row in set (0.02 sec)
@@ -525,7 +525,7 @@ mysql> DROP USER 'Jobs'@'localhost';
 mysql> create database Test_db;use Test_db;
 
 // 导入sql
-source /Users/jobs/Desktop/Test_db.sql 
+source ~/Desktop/Test_db.sql 
 ```
 
 ### 5.1、显示全部用户
@@ -675,7 +675,7 @@ mysql> drop user 'Jobs'@'localhost';
 #### 5.6.1、运行脚本
 
 ```shell
-# !/bin/bash
+# shell: bash
 
 echo '关闭本机通过 brew 方式安装的 MySql 服务'
 brew services stop mysql
@@ -683,11 +683,11 @@ mysql.server stop
 
 echo '本机通过 brew 形式安装的 MySql 安装目录'
 brew list mysql
-# 不出意外，会对外输出 /opt/homebrew/Cellar/mysql
+# 不出意外，会对外输出 $(brew --prefix)/Cellar/mysql
 mysql --version
 
 mysqlVersion=$(mysql --version | awk -F 'Ver ' '{ print $2 }' | awk -F ' for' '{ print $1 }')
-fileCopy_fullname=$"/opt/homebrew/Cellar/mysql/"${mysqlVersion}"/.bottle/etc/my.cnf"
+fileCopy_fullname=$"$(brew --prefix)/Cellar/mysql/"${mysqlVersion}"/.bottle$SYSTEM_CONFIG_DIR/my.cnf"
 echo "fileCopy_fullname:"$fileCopy_fullname
 
 # 直接追加写入
@@ -702,8 +702,8 @@ EOF
 
 code $fileCopy_fullname
 read -p "检查完毕并保存:通过brew管理的Mysql配置文件【my.cnf】" 
-sudo cp $fileCopy_fullname /etc/my.cnf
-code /etc/my.cnf
+sudo cp $fileCopy_fullname $SYSTEM_CONFIG_DIR/my.cnf
+code $SYSTEM_CONFIG_DIR/my.cnf
 brew services restart mysql 
 
 echo "不需要验证密码，直接登录 mysql"
@@ -774,21 +774,21 @@ mysql> flush privileges;
 ```bash
 brew list mysql
 
-/opt/homebrew/Cellar/mysql
+$(brew --prefix)/Cellar/mysql
 ```
 
 **6.2.2、按照`.brew/mysql.rb`的配置逻辑，修改my.cnf，并使其生效**
 
 ![关于.brew:mysql.rb](./assets/关于.brew:mysql.rb.jpg)
 
-*`.bottle`是隐藏文件夹，其名下的`/etc/my.cnf`为 mysql 配置文件*
+*`.bottle`是隐藏文件夹，其名下的`$SYSTEM_CONFIG_DIR/my.cnf`为 mysql 配置文件*
 
-**6.2.3、编辑`.bottle/etc/my.cnf`，在其末尾增添一句话：`skip-grant-tables`**
+**6.2.3、编辑`.bottle$SYSTEM_CONFIG_DIR/my.cnf`，在其末尾增添一句话：`skip-grant-tables`**
 
-**6.2.4、复制`.bottle/etc/my.cnf  `→ `/etc  `**
+**6.2.4、复制`.bottle$SYSTEM_CONFIG_DIR/my.cnf  `→ `$SYSTEM_CONFIG_DIR  `**
 
 ```bash
-cp /opt/homebrew/Cellar/mysql/8.0.32/.bottle/etc/my.cnf /etc  
+cp $(brew --prefix)/Cellar/mysql/8.0.32/.bottle$SYSTEM_CONFIG_DIR/my.cnf $SYSTEM_CONFIG_DIR  
 ```
 
 ![使得my.cnf生效](./assets/使得my.cnf生效.jpg)
@@ -802,7 +802,7 @@ mysql.server restart
 **删除 brew-MySQL 数据库并重置密码为空的脚本**
 
 ```shell
-#!/bin/bash
+# shell: bash
 
 echo '关闭本机通过 brew 方式安装的 MySql 服务'
 brew services stop mysql
@@ -811,10 +811,10 @@ echo '彻底删除本机通过 brew 方式安装的 MySql'
 brew uninstall mysql
 # brew cleanup
 
-open /opt/homebrew/var/mysql
+open $(brew --prefix)/var/mysql
 read -p "是否删除本地 mysql 的 database？回车删除，其他任意字符不删除" delMysqlDB
 if [[ $delMysqlDB = "" ]];then
-    mySqlDBPATH=$"/opt/homebrew/var/mysql"
+    mySqlDBPATH=$"$(brew --prefix)/var/mysql"
     rm -r $mySqlDBPATH
 fi
 
@@ -822,11 +822,11 @@ echo '本机重新通过 brew 形式安装 MySql'
 brew install mysql
 echo '本机通过 brew 形式安装的 MySql 安装目录'
 brew list mysql
-# 不出意外，会对外输出 /opt/homebrew/Cellar/mysql
+# 不出意外，会对外输出 $(brew --prefix)/Cellar/mysql
 mysql --version
 
 mysqlVersion=$(mysql --version | awk -F 'Ver ' '{ print $2 }' | awk -F ' for' '{ print $1 }')
-fileCopy_fullname=$"/opt/homebrew/Cellar/mysql/"${mysqlVersion}"/.bottle/etc/my.cnf"
+fileCopy_fullname=$"$(brew --prefix)/Cellar/mysql/"${mysqlVersion}"/.bottle$SYSTEM_CONFIG_DIR/my.cnf"
 echo "fileCopy_fullname:"$fileCopy_fullname
 
 grep skip-grant-tables $fileCopy_fullname
@@ -837,8 +837,8 @@ EOF
 fi
 
 code $fileCopy_fullname
-sudo cp $fileCopy_fullname /etc/my.cnf
-code /etc/my.cnf
+sudo cp $fileCopy_fullname $SYSTEM_CONFIG_DIR/my.cnf
+code $SYSTEM_CONFIG_DIR/my.cnf
 brew services restart mysql 
 ```
 
@@ -941,14 +941,14 @@ mysql> show global variables like "%datadir%" ;
 +---------------+--------------------------+
 | Variable_name | Value          |
 +---------------+--------------------------+
-| datadir    | /opt/homebrew/var/mysql/ |
+| datadir    | $(brew --prefix)/var/mysql/ |
 +---------------+--------------------------+
 
 1 row in set (0.02 sec)
 ```
 
 ```bash
-open /opt/homebrew/var/mysql/
+open $(brew --prefix)/var/mysql/
 ```
 
 ## 8、命令行建库（test_jobs）建表（user_time_login_stat）
@@ -962,7 +962,7 @@ Query OK, 0 rows affected (0.01 sec)
 *数据库本地化文件路径地址*
 
 ```javascript
-/opt/homebrew/var/mysql/test_jobs/user_time_login_stat.ibd
+$(brew --prefix)/var/mysql/test_jobs/user_time_login_stat.ibd
 ```
 
 ## 9、MySql 日志
@@ -1042,7 +1042,7 @@ mysql> system pwd
 *关键词：`source`*
 
 ```mysql
-mysql> source /Users/jobs/Desktop/test.sql 
+mysql> source ~/Desktop/test.sql 
 ```
 
 ## 11、命令行使用 MySql ❤️
