@@ -64,7 +64,7 @@ cd "脚本所在目录/【MacOS】升级Ruby环境.sh"
 Jobs 标准脚本日志默认写入：
 
 ```text
-/tmp/【MacOS】升级Ruby环境.log
+$TMPDIR/【MacOS】升级Ruby环境.log
 ```
 
 如果脚本内部另有 `LOG_FILE` 定义，以主脚本实际配置为准。

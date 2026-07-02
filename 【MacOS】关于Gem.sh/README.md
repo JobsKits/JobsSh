@@ -62,7 +62,7 @@ cd "脚本所在目录/【MacOS】关于Gem.sh"
 Jobs 标准脚本日志默认写入：
 
 ```text
-/tmp/【MacOS】关于Gem.log
+$TMPDIR/【MacOS】关于Gem.log
 ```
 
 如果脚本内部另有 `LOG_FILE` 定义，以主脚本实际配置为准。

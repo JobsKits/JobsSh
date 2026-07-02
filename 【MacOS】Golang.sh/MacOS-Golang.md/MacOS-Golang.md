@@ -12,14 +12,14 @@
 
 ```bash
 ➜  ~ whereis go
-go: /usr/local/go
+go: $(brew --prefix)/go
 ```
 
 ### 1.2、通过 brew 安装的（推荐）
 
 ```bash
 ➜  ~ whereis go
-go: /opt/homebrew/bin/go
+go: $(brew --prefix)/bin/go
 ```
 
 ## 2、安装 Golang 环境
@@ -67,7 +67,7 @@ go env | grep GOPATH
 open ~/.bash_profile 
 
 2、文末加上
-export GOPATH=/usr/local/go
+export GOPATH=$(brew --prefix)/go
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOBIN
 
@@ -102,19 +102,19 @@ go env | grep GOPATH
 
 ### 5.1、【删除】直接安装到系统的
 
-#### 5.1.1、删除 go 目录，通常为目录 /usr/local/go
+#### 5.1.1、删除 go 目录，通常为目录 $(brew --prefix)/go
 
-`sudo rm -rf /usr/local/go`
+`sudo rm -rf $(brew --prefix)/go`
 
 `sudo rm -rf ${HOME}/go`
 
 #### 5.1.2、从 PATH 环境变量中移除 Go 的 bin 目录
 
-PATH 配置在 `$~/.bash_profile` 或者` /etc/profile`，根据实际情况删除
+PATH 配置在 `$~/.bash_profile` 或者` $SYSTEM_CONFIG_DIR/profile`，根据实际情况删除
 
-#### 5.1.3、如果是通过Mac OS X 包安装的 Go，还需要移除` /etc/paths.d/go` 文件
+#### 5.1.3、如果是通过Mac OS X 包安装的 Go，还需要移除` $SYSTEM_CONFIG_DIR/paths.d/go` 文件
 
-`sudo rm -rf /etc/paths.d/go`
+`sudo rm -rf $SYSTEM_CONFIG_DIR/paths.d/go`
 
 #### 5.1.4 、使得配置文件生效
 

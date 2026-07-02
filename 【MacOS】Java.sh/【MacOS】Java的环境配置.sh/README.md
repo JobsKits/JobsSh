@@ -1,4 +1,4 @@
-# `【MacOS】PhpApacheConfig.sh`
+# `【MacOS】Java的环境配置.sh`
 
 ![Jobs出品，必属精品](https://picsum.photos/1500/400)
 
@@ -8,19 +8,19 @@
 
 ## 🔥 <font id=前言>前言</font>
 
-`【MacOS】PhpApacheConfig.sh` 用于执行“【MacOS】PhpApacheConfig”对应的 MacOS 自动化流程。主脚本与本 `README.md` 必须保持在同一目录，运行前先阅读影响范围。
+`【MacOS】Java的环境配置.sh` 用于执行“【MacOS】Java的环境配置”对应的 MacOS 自动化流程。主脚本与本 `README.md` 必须保持在同一目录，运行前先阅读影响范围。
 
 ## 一、适用场景 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
-- 需要执行“【MacOS】PhpApacheConfig”所描述的本机开发或维护任务。
+- 需要执行“【MacOS】Java的环境配置”所描述的本机开发或维护任务。
 - 希望通过可重复运行的 Shell 脚本减少手工命令遗漏。
 - 需要结合终端日志定位环境、路径或第三方工具问题。
 
 ## 二、目录结构
 
 ```text
-【MacOS】PhpApacheConfig.sh/
-├── 【MacOS】PhpApacheConfig.sh
+【MacOS】Java的环境配置.sh/
+├── 【MacOS】Java的环境配置.sh
 └── README.md
 ```
 
@@ -35,13 +35,13 @@
 
 ### 4.1、双击运行
 
-在 Finder 中打开当前目录并双击 `【MacOS】PhpApacheConfig.sh`。阅读终端自述后按回车继续，按 `Ctrl+C` 取消。
+在 Finder 中打开当前目录并双击 `【MacOS】Java的环境配置.sh`。阅读终端自述后按回车继续，按 `Ctrl+C` 取消。
 
 ### 4.2、终端运行
 
 ```shell
-cd "脚本所在目录/【MacOS】PhpApacheConfig.sh"
-./【MacOS】PhpApacheConfig.sh
+cd "脚本所在目录/【MacOS】Java的环境配置.sh"
+./【MacOS】Java的环境配置.sh
 ```
 
 ## 五、操作流程
@@ -62,7 +62,7 @@ cd "脚本所在目录/【MacOS】PhpApacheConfig.sh"
 Jobs 标准脚本日志默认写入：
 
 ```text
-/tmp/【MacOS】PhpApacheConfig.log
+$TMPDIR/【MacOS】Java的环境配置.log
 ```
 
 如果脚本内部另有 `LOG_FILE` 定义，以主脚本实际配置为准。
