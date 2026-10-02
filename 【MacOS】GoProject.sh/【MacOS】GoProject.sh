@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 # 脚本自述：
 # - 脚本名称：【MacOS】GoProject.sh
 # - 核心用途：执行“GoProject”对应的自动化任务。
@@ -14,9 +14,9 @@ show_script_intro_and_wait() {
   print -r -- '============================================================================'
   if [[ ! -t 0 ]]; then
     print -u2 -r -- '当前没有可交互输入，请在终端中重新运行。'
-    return 1
+    exit 1
   fi
-  read -r "?👉 已了解脚本用途与影响，按回车继续；按 Ctrl+C 取消：" _
+  read -r "?👉 已了解脚本用途与影响，按回车继续；按 Ctrl+C 取消：" _ || exit 1
 }
 # 执行入口下沉后的完整业务流程和控制逻辑。
 # 检测是否已经安装了brew
@@ -60,7 +60,7 @@ COMMENT
 ## 添加默认值（字符串）
 function defaultInput() {
     result=${1}
-    if [${1} = $""]
+    if [${1} = ""]
     then
         # 什么都不输入，即默认值
         result=$'Test'
@@ -128,7 +128,7 @@ function projInit(){
     printf '【自动化前置部署Go项目】\n\n'
     # 读取键盘输入，回车结束监听记录
     echo "【温馨提示：如果什么都没有输入，那么启用默认文件夹名Test】"
-    read -p "请输入项目文件夹名字,以回车结束:" folder_name
+    read "?请输入项目文件夹名字,以回车结束:" folder_name
 
     defaultInput $folder_name
     folder_name=${result}
@@ -158,7 +158,7 @@ file_name=${result}
 # echo "The value of var is ${result}"
 
 # 新建一个文件，命名为Test
-file_name=$file_name$".go"
+file_name=$file_name".go"
 # writeFileContent ${file_name} # 写内容到文件
 # 编排脚本的高层业务流程。
 # 初始化脚本运行环境，并集中承载原有的顶层执行逻辑。
@@ -189,7 +189,7 @@ run_main_business_flow() {
   fi
   projInit # 项目初始化
   echo "【温馨提示：如果什么都没有输入，那么启用默认文件名Test】"
-  read -p "请输入新建文件名字，以回车结束:" file_name
+  read "?请输入新建文件名字，以回车结束:" file_name
   defaultInput $file_name
   Touch $file_name
   echo ${file_name}
@@ -213,11 +213,14 @@ EOF
   localGoEnvInfo # 生成一些配置说明文件
   GOPATHConf # GOPATH 配置
 }
+# 初始化 zsh 通配符策略。
+initialize_script_runtime() {
+  setopt NO_NOMATCH TYPESET_SILENT
+}
 # 编排脚本的高层业务流程。
 main() {
-  # 展示脚本内置自述，并按运行入口完成防误触确认。
-  show_script_intro_and_wait
-  # 执行脚本原有的完整业务流程。
-  run_main_business_flow "$@"
+  show_script_intro_and_wait # 展示脚本内置自述，并按运行入口完成防误触确认。
+  initialize_script_runtime # 确认后初始化 zsh 运行选项。
+  run_main_business_flow "$@" # 执行脚本原有的完整业务流程。
 }
 main "$@"

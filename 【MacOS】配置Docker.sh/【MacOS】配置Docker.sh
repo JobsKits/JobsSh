@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/zsh
 # 脚本自述：
 # - 脚本名称：【MacOS】配置Docker.sh
 # - 核心用途：执行“配置Docker”对应的本机环境配置任务。
@@ -14,9 +14,9 @@ show_script_intro_and_wait() {
   print -r -- '============================================================================'
   if [[ ! -t 0 ]]; then
     print -u2 -r -- '当前没有可交互输入，请在终端中重新运行。'
-    return 1
+    exit 1
   fi
-  read -r "?👉 已了解脚本用途与影响，按回车继续；按 Ctrl+C 取消：" _
+  read -r "?👉 已了解脚本用途与影响，按回车继续；按 Ctrl+C 取消：" _ || exit 1
 }
 # 执行入口下沉后的完整业务流程和控制逻辑。
 run_main_business_flow() {
@@ -36,12 +36,15 @@ docker --version
 # 查看是否配置成功
 docker info
 }
+# 初始化 zsh 通配符策略。
+initialize_script_runtime() {
+  setopt NO_NOMATCH TYPESET_SILENT
+}
 # 编排脚本的高层业务流程。
 main() {
-  # 展示脚本内置自述，并按运行入口完成防误触确认。
-  show_script_intro_and_wait
-  # 执行入口下沉后的完整业务流程。
-  run_main_business_flow "$@"
+  show_script_intro_and_wait # 展示脚本内置自述，并按运行入口完成防误触确认。
+  initialize_script_runtime # 确认后初始化 zsh 运行选项。
+  run_main_business_flow "$@" # 执行入口下沉后的完整业务流程。
 }
 
 main "$@"

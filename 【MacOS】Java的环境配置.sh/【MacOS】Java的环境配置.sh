@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 # 脚本自述：
 # - 脚本名称：【MacOS】Java的环境配置.sh
 # - 核心用途：执行“Java的环境配置”对应的本机环境配置任务。
@@ -14,9 +14,9 @@ show_script_intro_and_wait() {
   print -r -- '============================================================================'
   if [[ ! -t 0 ]]; then
     print -u2 -r -- '当前没有可交互输入，请在终端中重新运行。'
-    return 1
+    exit 1
   fi
-  read -r "?👉 已了解脚本用途与影响，按回车继续；按 Ctrl+C 取消：" _
+  read -r "?👉 已了解脚本用途与影响，按回车继续；按 Ctrl+C 取消：" _ || exit 1
 }
 # 执行入口下沉后的完整业务流程和控制逻辑。
 run_main_business_flow() {
@@ -45,7 +45,7 @@ echo "Available JDK Versions:"
 # 输出当前步骤的提示或执行进度。
 echo $jdk_versions
 ## 获取用户输入的JDK版本号
-read -p "Please input the JDK version you want to download (default: JDK8): " jdk_version
+read "?Please input the JDK version you want to download (default: JDK8): " jdk_version
 ## 如果用户未输入版本号，则默认下载JDK8
 jdk_version=${jdk_version:-JDK8}
 # 输出当前步骤的提示或执行进度。
@@ -53,7 +53,7 @@ echo "You choose to download JDK $jdk_version."
 
 # 2、让用户选择是以 curl 或者 wget 哪种方式下载 JDK
 ## 获取用户希望使用的下载工具
-read -p "Please choose download tool (curl/wget, default: curl): " download_tool
+read "?Please choose download tool (curl/wget, default: curl): " download_tool
 ## 如果用户未输入下载工具，则默认使用curl
 download_tool=${download_tool:-curl}
 # 输出当前步骤的提示或执行进度。
@@ -143,12 +143,15 @@ source ~/.bash_profile
 ## 在TextEdit中打开环境变量文件
 open ~/.bash_profile
 }
+# 初始化 zsh 通配符策略。
+initialize_script_runtime() {
+  setopt NO_NOMATCH TYPESET_SILENT
+}
 # 编排脚本的高层业务流程。
 main() {
-  # 展示脚本内置自述，并按运行入口完成防误触确认。
-  show_script_intro_and_wait
-  # 执行入口下沉后的完整业务流程。
-  run_main_business_flow "$@"
+  show_script_intro_and_wait # 展示脚本内置自述，并按运行入口完成防误触确认。
+  initialize_script_runtime # 确认后初始化 zsh 运行选项。
+  run_main_business_flow "$@" # 执行入口下沉后的完整业务流程。
 }
 
 main "$@"
