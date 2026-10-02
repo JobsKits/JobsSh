@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 # 脚本自述：
 # - 脚本名称：【MacOS】删除brew-MySql数据库并重置密码为空.sh
 # - 核心用途：执行“删除brew-MySql数据库并重置密码为空”对应的清理任务。
@@ -14,9 +14,9 @@ show_script_intro_and_wait() {
   print -r -- '============================================================================'
   if [[ ! -t 0 ]]; then
     print -u2 -r -- '当前没有可交互输入，请在终端中重新运行。'
-    return 1
+    exit 1
   fi
-  read -r "?👉 已了解脚本用途与影响，按回车继续；按 Ctrl+C 取消：" _
+  read -r "?👉 已了解脚本用途与影响，按回车继续；按 Ctrl+C 取消：" _ || exit 1
 }
 # 执行入口下沉后的完整业务流程和控制逻辑。
 run_main_business_flow() {
@@ -35,11 +35,11 @@ brew uninstall mysql
 # 执行当前流程中的独立业务步骤：open。
 open /opt/homebrew/var/mysql
 # 收集用户输入，供后续业务判断使用。
-read -p "是否删除本地 mysql 的 database？回车删除，其他任意字符不删除" delMysqlDB
+read "?是否删除本地 mysql 的 database？回车删除，其他任意字符不删除" delMysqlDB
 # 根据当前条件选择对应的执行分支。
 if [[ $delMysqlDB = "" ]];then
     # 初始化当前流程后续步骤需要使用的变量。
-    mySqlDBPATH=$"/opt/homebrew/var/mysql"
+    mySqlDBPATH="/opt/homebrew/var/mysql"
     # 执行当前流程中的独立业务步骤：rm。
     rm -r $mySqlDBPATH
 fi
@@ -57,7 +57,7 @@ mysql --version
 
 # 字符串截取 mysql 的版本号
 mysqlVersion=$(mysql --version | awk -F 'Ver ' '{ print $2 }' | awk -F ' for' '{ print $1 }')
-fileCopy_fullname=$"/opt/homebrew/Cellar/mysql/"${mysqlVersion}"/.bottle/etc/my.cnf"
+fileCopy_fullname="/opt/homebrew/Cellar/mysql/"${mysqlVersion}"/.bottle/etc/my.cnf"
 # 输出当前步骤的提示或执行进度。
 echo "fileCopy_fullname:"$fileCopy_fullname
 
@@ -80,12 +80,15 @@ code /etc/my.cnf
 # 执行当前流程中的独立业务步骤：brew。
 brew services restart mysql
 }
+# 初始化 zsh 通配符策略。
+initialize_script_runtime() {
+  setopt NO_NOMATCH TYPESET_SILENT
+}
 # 编排脚本的高层业务流程。
 main() {
-  # 展示脚本内置自述，并按运行入口完成防误触确认。
-  show_script_intro_and_wait
-  # 执行入口下沉后的完整业务流程。
-  run_main_business_flow "$@"
+  show_script_intro_and_wait # 展示脚本内置自述，并按运行入口完成防误触确认。
+  initialize_script_runtime # 确认后初始化 zsh 运行选项。
+  run_main_business_flow "$@" # 执行入口下沉后的完整业务流程。
 }
 
 main "$@"
