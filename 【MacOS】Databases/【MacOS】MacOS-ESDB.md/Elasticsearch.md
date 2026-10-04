@@ -1,10 +1,10 @@
-# MacOS elasticsearch
+# <span id="前言">MacOS elasticsearch</span>
 
 ![Jobs出品，必属精品](https://picsum.photos/1500/400)
 
 [TOC]
 
-## 1、使用`brew` 安装 `elasticsearch`
+## 1、使用`brew` 安装 `elasticsearch` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *相关资料*
 
@@ -51,3 +51,4 @@ $(brew --prefix)/Cellar/elasticsearch-full/7.17.4/libexec/lib/ (45 files)
 $(brew --prefix)/Cellar/elasticsearch-full/7.17.4/libexec/modules/ (418 files)
 ```
 
+<a id="🔚" href="#前言" style="font-size:17px; color:green; font-weight:bold;">我是有底线的➤点我回到首页</a>

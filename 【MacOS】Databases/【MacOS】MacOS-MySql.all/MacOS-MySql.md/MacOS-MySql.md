@@ -1,4 +1,4 @@
-# MacOS（本机）- MySql
+# <span id="前言">MacOS（本机）- MySql</span>
 
 ![Jobs出品，必属精品](https://picsum.photos/1500/400)
 
@@ -59,13 +59,13 @@
 
 [C语言中文网/MySQL查看用户权限](http://c.biancheng.net/view/7498.html)
 
-## 1、卸载 和 删除 MySql
+## 1、卸载 和 删除 MySql <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *资料来源*
 
 [如何清理 brew 安装的 mysql ？mysql 的数据文件在哪里？](https://newsn.net/say/brew-uninstall-mysql.html)
 
-### 1.1、清除程序体
+### 1.1、清除程序体 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *用 brew 管理*
 
@@ -98,7 +98,7 @@ sudo rm -rf $TMPDIR/db/receipts/MySQL*
 sudo rm -rf $SYSTEM_VAR_DIR/db/receipts/com.mysql.*
 ```
 
-### 1.2、清除数据库物理实体文件
+### 1.2、清除数据库物理实体文件 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *1、先查询数据库物理实体文件路径*
 
@@ -119,9 +119,9 @@ mysql> show global variables like "%datadir%" ;
 rm -r $(brew --prefix)/var/mysql
 ```
 
-## 2、多种方式安装和管理 MySql
+## 2、多种方式安装和管理 MySql <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
-### 2.1、用 brew 容器管理 MySql❤️
+### 2.1、用 brew 容器管理 MySql❤️ <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```bash
 brew install mysql // 安装mysql
@@ -146,13 +146,13 @@ brew services start mysql // 启动MySQL
 
 ![通过brew安装的MySql目录结构](./assets/通过brew安装的MySql目录结构.jpg)
 
-### 2.2、从官网下载 MySql 直接安装在本机（未验证)
+### 2.2、从官网下载 MySql 直接安装在本机（未验证) <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```javascript
 open https://juejin.cn/post/6844903956305412104
 ```
 
-### 2.3、用 `Macport`/`brew`/`MySql` 官网下载直接安装到本机的区别
+### 2.3、用 `Macport`/`brew`/`MySql` 官网下载直接安装到本机的区别 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *Macport 和 brew 作为容器管理着 MySql 的生命周期，那么对于 MySql 的服务开启\关闭、重启 等的命令方式不一样*
 
@@ -164,7 +164,7 @@ open https://juejin.cn/post/6844903956305412104
 
 *因为安全原因，MySql的某些版本对于忘记密码的操作不一样，也就是说可能都不存在教程上的文件和路径*
 
-### 2.4、端口号
+### 2.4、端口号 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *查看MySQL默认端口号*
 
@@ -178,7 +178,7 @@ mysql> show global variables like 'port';
 1 row in set (0.04 sec)
 ```
 
-### 2.5、关于版本号
+### 2.5、关于版本号 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *MySql 忽然从5.7升级到了8.0，直接跳过了6和7。即，版本号码：5.5/5.6/5.7/8.0*
 
@@ -216,7 +216,7 @@ mysql> select version();
 1 row in set (0.00 sec)
 ```
 
-### 2.6、查询本机的 MySql 的 PID
+### 2.6、查询本机的 MySql 的 PID <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *👇🏻能和"活动监视器"的数据对得上*
 
@@ -224,7 +224,7 @@ mysql> select version();
 lsof -nP -i | grep mysql   
 ```
 
-### 2.7、`mysql`与`mysqld`
+### 2.7、`mysql`与`mysqld` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *区别*
 
@@ -239,7 +239,7 @@ mysql是命令行客户端程序
 mysqld 的守护进程 mysqld_safe ,也是 mysqld 的父进程（守护进程）
 ```
 
-### 2.8、登录 Mysql
+### 2.8、登录 Mysql <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *查询当前登录账户*
 
@@ -263,9 +263,9 @@ mysql
 mysql -u root -p
 ```
 
-### 2.9、MySql 常见报错分析（欢迎补充）❤️
+### 2.9、MySql 常见报错分析（欢迎补充）❤️ <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
-#### 2.9.1、ERROR 2002 (HY000)
+#### 2.9.1、ERROR 2002 (HY000) <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 【 mysql 服务没有启动】
@@ -281,7 +281,7 @@ ERROR 2002 (HY000): Can't connect to local MySQL server through socket '$TMPDIR/
 如果密码有误，则报错：ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
 ```
 
-#### 2.9.2、ERROR 1290 (HY000)
+#### 2.9.2、ERROR 1290 (HY000) <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 相关说明：
@@ -305,21 +305,21 @@ mysql> DROP USER 'root'@'localhost';
 Query OK, 0 rows affected (0.02 sec)
 ```
 
-#### 2.9.3、ERROR 1227 (42000)
+#### 2.9.3、ERROR 1227 (42000) <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 mysql> FLUSH privileges;
 ERROR 1227 (42000): Access denied; you need (at least one of) the RELOAD privilege(s) for this operation
 ```
 
-#### 2.9.5、ERROR 1044 (42000)
+#### 2.9.5、ERROR 1044 (42000) <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 mysql> create database go_db;
 ERROR 1044 (42000): Access denied for user 'Jobs'@'localhost' to database 'go_db'
 ```
 
-## 3、关于 Mysql 配置文件 `my.cnf`
+## 3、关于 Mysql 配置文件 `my.cnf` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```
 用 brew 管理的 mysql 有2个配置文件：
@@ -328,7 +328,7 @@ ERROR 1044 (42000): Access denied for user 'Jobs'@'localhost' to database 'go_db
 brew_mysql 的配置文件 需要映射到 系统的 mysql 配置文件 方可生效
 ```
 
-### 3.1、配置文件的加载顺序
+### 3.1、配置文件的加载顺序 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *资料来源*
 
@@ -344,7 +344,7 @@ brew_mysql 的配置文件 需要映射到 系统的 mysql 配置文件 方可�
 $SYSTEM_CONFIG_DIR/my.cnf $SYSTEM_CONFIG_DIR/mysql/my.cnf $(brew --prefix)/etc/my.cnf ~/.my.cnf 
 ```
 
-### 3.2、修改 Mysql 配置文件 `my.cnf` 的脚本
+### 3.2、修改 Mysql 配置文件 `my.cnf` 的脚本 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *温馨提示：先修改再运行*
 
@@ -387,20 +387,20 @@ echo "不需要验证密码，直接登录 mysql"
 mysql -p   
 ```
 
-### 3.3、一些参数
+### 3.3、一些参数 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 `skip_networking`该变量控制是否关闭TCP/IP连接，默认允许，如果启用，则只能本地socker连接。如果只是本地客户端连接，强烈建议开启。
 
-## 4、查询本机的 MySql 的路径
+## 4、查询本机的 MySql 的路径 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
-###  4.1、安装路径
+###  4.1、安装路径 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```bash
 ➜  ~ whereis mysql
 mysql: $(brew --prefix)/bin/mysql $(brew --prefix)/share/man/man1/mysql.1
 ```
 
-### 4.2、安装目录
+### 4.2、安装目录 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```bash
 ➜  ~ brew list mysql
@@ -481,7 +481,7 @@ $(brew --prefix)/Cellar/mysql/8.0.32/support-files/ (3 files)
 $(brew --prefix)/Cellar/mysql
 ```
 
-### 4.3、存放数据的物理文件目录
+### 4.3、存放数据的物理文件目录 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 mysql> show global variables like "%datadir%" ;  
@@ -494,7 +494,7 @@ mysql> show global variables like "%datadir%" ;
 1 row in set (0.02 sec)
 ```
 
-## 5、 MySql 用户
+## 5、 MySql 用户 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *资料来源*
 
@@ -528,7 +528,7 @@ mysql> create database Test_db;use Test_db;
 source ~/Desktop/Test_db.sql 
 ```
 
-### 5.1、显示全部用户
+### 5.1、显示全部用户 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *USE mysql;select user,host from user;*
 
@@ -551,7 +551,7 @@ mysql> select user,host from user;
 5 rows in set (0.04 sec)
 ```
 
-### 5.2、显示当前用户
+### 5.2、显示当前用户 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 mysql> select user();
@@ -563,7 +563,7 @@ mysql> select user();
 1 row in set (0.00 sec)
 ```
 
-### 5.3、新建用户
+### 5.3、新建用户 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 命令格式：mysql>
@@ -616,11 +616,11 @@ SHOW GRANTS FOR 'username'@'hostname';
 GRANT permission ON database.table TO 'username'@'hostname';
 ```
 
-### 5.4、授权
+### 5.4、授权 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 [Mysql 查看用户授予的权限](https://www.cnblogs.com/kerrycode/p/7423850.html)
 
-#### 5.4.1、用户授权
+#### 5.4.1、用户授权 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 命令格式：
@@ -633,7 +633,7 @@ databasename：数据库名
 tablename：表名，如果要授予该用户对所有数据库和表的相应操作权限则可用*表示，如*.*
 ```
 
-##### 5.4.1.1、加库权限
+##### 5.4.1.1、加库权限 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 **注意：这个地方是`localhost`**
 
@@ -642,7 +642,7 @@ mysql> GRANT ALL PRIVILEGES ON *.* TO 'Jobs'@'localhost';
 Query OK, 0 rows affected (0.00 sec)
 ```
 
-##### 5.4.1.2、加表权限
+##### 5.4.1.2、加表权限 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 **注意：这个地方是`localhost`**
 
@@ -651,13 +651,13 @@ mysql> GRANT SELECT,INSERT,UPDATE,DELETE ON *.* TO 'Jobs'@'localhost';
 Query OK, 0 rows affected (0.00 sec)
 ```
 
-#### 5.4.2、用户权限查询
+#### 5.4.2、用户权限查询 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 mysql> SHOW GRANTS FOR 'Jobs'@'localhost';
 ```
 
-### 5.5、删除用户
+### 5.5、删除用户 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 命令格式：
@@ -666,13 +666,13 @@ drop user 'username'@'host';
 mysql> drop user 'Jobs'@'localhost';
 ```
 
-### 5.6、误删 root 用户的解决办法❤️
+### 5.6、误删 root 用户的解决办法❤️ <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *资料来源*
 
 [CSDN/mysql 删除root用户_mysql误删root用户解决办法](https://blog.csdn.net/weixin_42521856/article/details/113152530)
 
-#### 5.6.1、运行脚本
+#### 5.6.1、运行脚本 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```shell
 # shell: bash
@@ -710,7 +710,7 @@ echo "不需要验证密码，直接登录 mysql"
 mysql -p   
 ```
 
-#### 5.6.2、以系统用户名进行登录 Mysql ，并执行相关 sql
+#### 5.6.2、以系统用户名进行登录 Mysql ，并执行相关 sql <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 mysql -p
@@ -720,7 +720,7 @@ mysql> insert into user set user='root',ssl_cipher=",x509_issuer=",x509_subject=
 mysql> update user set Host='localhost',select_priv='y', insert_priv='y',update_priv='y', Alter_priv='y',delete_priv='y',create_priv='y',drop_priv='y',reload_priv='y',shutdown_priv='y',Process_priv='y',file_priv='y',grant_priv='y',References_priv='y',index_priv='y',create_user_priv='y',show_db_priv='y',super_priv='y',create_tmp_table_priv='y',Lock_tables_priv='y',execute_priv='y',repl_slave_priv='y',repl_client_priv='y',create_view_priv='y',show_view_priv='y',create_routine_priv='y',alter_routine_priv='y',create_user_priv='y' where user='root';  
 ```
 
-### 5.7、更改 MySql 数据库用户名
+### 5.7、更改 MySql 数据库用户名 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 mysql -u root -p
@@ -734,7 +734,7 @@ mysql> flush privileges;    // 刷新权限【一定要这一步，否则不成�
 mysql> exit
 ```
 
-## 6、MySql 密码修改
+## 6、MySql 密码修改 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *资料来源*
 
@@ -744,7 +744,7 @@ mysql> exit
 
 **温馨提示：无密码状态，不能用任何客户端链接成功**
 
-### 6.1、修改非 root 账户对应的密码
+### 6.1、修改非 root 账户对应的密码 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 举例：
@@ -752,7 +752,7 @@ mysql> exit
 mysql> ALTER USER 'Jobs'@'%' IDENTIFIED BY '123456';
 ```
 
-### 6.2、修改 root 账户对应的密码
+### 6.2、修改 root 账户对应的密码 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 一般情况下，新安装的mysql的root账户是没有密码的
@@ -761,7 +761,7 @@ mysql> alter user 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
 mysql> flush privileges;
 ```
 
-### 6.2、通过修改 MySql 的配置文件`my.cnf`来修改密码【附脚本】❤️
+### 6.2、通过修改 MySql 的配置文件`my.cnf`来修改密码【附脚本】❤️ <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```javascript
 资料来源
@@ -860,7 +860,7 @@ owners.
 Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 ```
 
-### 6.3、MySql 的密码策略❤️
+### 6.3、MySql 的密码策略❤️ <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *查看密码管理策略*
 
@@ -928,7 +928,7 @@ mysql> flush privileges;
 brew services restart mysql
 ```
 
-## 7、查看 MySql 数据库物理文件存放位置❤️
+## 7、查看 MySql 数据库物理文件存放位置❤️ <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```javascript
 资料来源
@@ -951,7 +951,7 @@ mysql> show global variables like "%datadir%" ;
 open $(brew --prefix)/var/mysql/
 ```
 
-## 8、命令行建库（test_jobs）建表（user_time_login_stat）
+## 8、命令行建库（test_jobs）建表（user_time_login_stat） <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 mysql> CREATE TABLE user_time_login_stat ( id int NOT NULL AUTO_INCREMENT,  PRIMARY KEY (id)) ;
@@ -965,13 +965,13 @@ Query OK, 0 rows affected (0.01 sec)
 $(brew --prefix)/var/mysql/test_jobs/user_time_login_stat.ibd
 ```
 
-## 9、MySql 日志
+## 9、MySql 日志 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *资料来源*
 
 [CSDN/mysql 查看日志和启动日志](https://blog.csdn.net/Kirito_j/article/details/82714515)
 
-### 9.1、Mysql 有以下几种日志👇🏻
+### 9.1、Mysql 有以下几种日志👇🏻 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 | 错误日志   |     -log-err      |
 | :--------- | :---------------: |
@@ -980,7 +980,7 @@ $(brew --prefix)/var/mysql/test_jobs/user_time_login_stat.ibd
 | 更新日志   |    -log-update    |
 | 二进制日志 |     -log-bin      |
 
-### 9.2、日志的查询
+### 9.2、日志的查询 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *查看日志*
 
@@ -1012,7 +1012,7 @@ mysql> show master status;
 mysql> show master logs; 
 ```
 
-## 10、MySql 和 Shell 命令的互相调用
+## 10、MySql 和 Shell 命令的互相调用 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *资料来源*
 
@@ -1020,7 +1020,7 @@ mysql> show master logs;
 
 [CSDN/在mysql中执行shell命令](https://blog.csdn.net/wocjj/article/details/7459033)
 
-### 10.1、在 Shell 中执行 MySql 相关查询
+### 10.1、在 Shell 中执行 MySql 相关查询 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *通过参数-e*
 
@@ -1028,7 +1028,7 @@ mysql> show master logs;
 mysql -uroot -p -e "show databases"
 ```
 
-### 10.2、在 MySql 命令行中执行 Shell 相关命令
+### 10.2、在 MySql 命令行中执行 Shell 相关命令 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *system + 系统shell命令（不需要分号） 或者 `\! 系统shell命令`*
 
@@ -1037,7 +1037,7 @@ mysql> system date
 mysql> system pwd
 ```
 
-### 10.3、MySql 执行外部`x.sql`
+### 10.3、MySql 执行外部`x.sql` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *关键词：`source`*
 
@@ -1045,7 +1045,7 @@ mysql> system pwd
 mysql> source ~/Desktop/test.sql 
 ```
 
-## 11、命令行使用 MySql ❤️
+## 11、命令行使用 MySql ❤️ <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *说明：此例中存在一个名为`Test_db`的数据库，库下面存在一张名为`user_tbl`的表*
 
@@ -1066,7 +1066,7 @@ CREATE TABLE IF NOT EXISTS `Test_db`.`user_tbl` (
  COMMENT = '用户表'
 ```
 
-### 11.1、 显示所有的数据库（注意：`databases` 是复数末尾要加`s`）
+### 11.1、 显示所有的数据库（注意：`databases` 是复数末尾要加`s`） <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 **关键词`show`**
 
@@ -1074,7 +1074,7 @@ CREATE TABLE IF NOT EXISTS `Test_db`.`user_tbl` (
 mysql> show databases;
 ```
 
-### 11.2、删除名为`test`的数据库
+### 11.2、删除名为`test`的数据库 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 **关键词`drop`**
 
@@ -1082,7 +1082,7 @@ mysql> show databases;
 mysql> drop test database;
 ```
 
-### 11.3、创建名为`test`的数据库
+### 11.3、创建名为`test`的数据库 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 **关键词`create`**
 
@@ -1090,7 +1090,7 @@ mysql> drop test database;
 mysql> create database test;
 ```
 
-### 11.4、使用用名为`test`的数据库（可以不用 `;`结尾）
+### 11.4、使用用名为`test`的数据库（可以不用 `;`结尾） <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 **关键词`use`**
 
@@ -1098,7 +1098,7 @@ mysql> create database test;
 use test;
 ```
 
-### 11.5、查看数据库`test`名下有什么表（当前只有一张名为`user`的表）
+### 11.5、查看数据库`test`名下有什么表（当前只有一张名为`user`的表） <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 **关键词`show`**
 
@@ -1114,7 +1114,7 @@ mysql> show tables;
 1 row in set (0.00 sec)
 ```
 
-### 11.6、查看数据表`user`的表结构
+### 11.6、查看数据表`user`的表结构 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 **关键词`describe`**
 
@@ -1131,15 +1131,15 @@ mysql> describe user;
 4 rows in set (0.01 sec)
 ```
 
-## 12、Go语言操作（增删改查）数据库（举例）
+## 12、Go语言操作（增删改查）数据库（举例） <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
-### 12.1、新建用户（账:Jobs;密:Jobs295060456） + 授权（库 + 表）+ 刷新 + 查询 + 建库（Test_db）用库
+### 12.1、新建用户（账:Jobs;密:Jobs295060456） + 授权（库 + 表）+ 刷新 + 查询 + 建库（Test_db）用库 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 mysql> select user();FLUSH privileges;CREATE USER 'Jobs'@'localhost' IDENTIFIED BY 'Jobs295060456';GRANT ALL PRIVILEGES ON *.* TO 'Jobs'@'localhost';GRANT SELECT,INSERT,UPDATE,DELETE ON *.* TO 'Jobs'@'localhost';USE mysql;select user,host from user;FLUSH privileges;create database Test_db;use Test_db;
 ```
 
-### 12.2、Test_db.sql
+### 12.2、Test_db.sql <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mysql
 create database Test_db;use Test_db;
@@ -1156,7 +1156,7 @@ CREATE TABLE IF NOT EXISTS `Test_db`.`user_tbl` (
  COMMENT = '用户表'
 ```
 
-### 12.3、Go语言代码
+### 12.3、Go语言代码 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```go
 package main
@@ -1262,7 +1262,7 @@ func queryDelete() {
 }
 ```
 
-## 13、一些插件
+## 13、一些插件 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 **语法提示且高亮**
 
@@ -1281,3 +1281,4 @@ brew install mycli
 mycli -u Jobs -h localhost -p password --database db_book
 ```
 
+<a id="🔚" href="#前言" style="font-size:17px; color:green; font-weight:bold;">我是有底线的➤点我回到首页</a>

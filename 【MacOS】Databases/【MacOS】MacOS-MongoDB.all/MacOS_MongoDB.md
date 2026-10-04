@@ -1,4 +1,4 @@
-# MacOS 平台上 关于芒果🥭数据库
+# <span id="前言">MacOS 平台上 关于芒果🥭数据库</span>
 
 ![Jobs出品，必属精品](https://picsum.photos/1500/400)
 
@@ -31,9 +31,9 @@
 
 [w3cschool/MongoDB 查询文档](https://www.w3cschool.cn/mongodb/mongodb-query.html)
 
-## 1、MacOS_MongoDB
+## 1、MacOS_MongoDB <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
-### 1.1、简介
+### 1.1、简介 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```json
 MongoDB 是由C++语言编写的，是一个基于分布式文件存储的开源数据库系统
@@ -50,7 +50,7 @@ MongoDB 文档类似于 JSON 对象
 }
 ```
 
-### 1.2、安装 `MongoDB`
+### 1.2、安装 `MongoDB` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *资料来源*
 
@@ -62,7 +62,7 @@ MongoDB 文档类似于 JSON 对象
 
 [稀土掘金/使用 brew 安装使用 mongodb](https://juejin.cn/post/7069566026655989767)
 
-#### 2.1、使用`Homebrew`安装 `mongodb`（废弃）
+#### 2.1、使用`Homebrew`安装 `mongodb`（废弃） <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```bash
 ➜  ~ brew install mongodb
@@ -108,7 +108,7 @@ To install gcollazo-mongodb ✔, run:
   brew install --cask gcollazo-mongodb ✔
 ```
 
-#### 2.1、使用 `Homebrew Cask` 安装 `gcollazo-mongodb`
+#### 2.1、使用 `Homebrew Cask` 安装 `gcollazo-mongodb` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```bash
 ➜  ~ brew reinstall --cask gcollazo-mongodb
@@ -161,7 +161,7 @@ Build Info: {
 }
 ```
 
-#### 2.2、使用 `Homebrew Cask` 安装 `MongoDB 6.0 Community Edition`
+#### 2.2、使用 `Homebrew Cask` 安装 `MongoDB 6.0 Community Edition` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```bash
 ➜  ~ brew reinstall mongodb-community
@@ -227,13 +227,13 @@ $(brew --prefix)/Cellar/mongodb-community/6.0.5/MPL-2
 $(brew --prefix)/Cellar/mongodb-community/6.0.5/THIRD-PARTY-NOTICES
 ```
 
-### 1.3、端口
+### 1.3、端口 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 `默认端口：27017`
 
-## 2、`MongoDB Compass`
+## 2、`MongoDB Compass` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
-### 2.1、安装 `MongoDB Compass`
+### 2.1、安装 `MongoDB Compass` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *相关资料*
 
@@ -253,13 +253,13 @@ brew install --cask mongodb-compass
 🍺  mongodb-compass was successfully installed!
 ```
 
-### 2.2、相关说明
+### 2.2、相关说明 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```
 MongoDB Compass是一个可视化GUI工具，方便我们通过可视化页面操作MongoDB
 ```
 
-## 3、`Mongosh`
+## 3、`Mongosh` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *MongoDB Shell工具：mongosh*
 
@@ -269,7 +269,7 @@ MongoDB Compass是一个可视化GUI工具，方便我们通过可视化页面�
 https://juejin.cn/post/7091969764024647710
 ```
 
-### 3.1、安装 `mongosh`
+### 3.1、安装 `mongosh` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```bash
 ➜  ~ brew install Mongosh                      
@@ -287,7 +287,7 @@ To reinstall 1.8.2, run:
 1.8.2
 ```
 
-### 3.2、利用`mongosh`访问`MongoDB`
+### 3.2、利用`mongosh`访问`MongoDB` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```bash
 ➜  ~ mongosh
@@ -329,9 +329,9 @@ local: 这个数据永远不会被复制，可以用来存储限于本地单台�
 config: 当Mongo用于分片设置时，config数据库在内部使用，用于保存分片的相关信息。
 ```
 
-### 3.3、利用`mongosh` CRUD 操作`MongoDB`
+### 3.3、利用`mongosh` CRUD 操作`MongoDB` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
-#### 3.3.1、创建（Create）名为`Jobs`的数据库
+#### 3.3.1、创建（Create）名为`Jobs`的数据库 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```
 1、直接use数据库，优化create环节；
@@ -361,7 +361,7 @@ config  108.00 KiB
 local    40.00 KiB
 ```
 
-#### 3.3.2、查询（Read）名为`Jobs`的数据库
+#### 3.3.2、查询（Read）名为`Jobs`的数据库 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *`pretty() `方法以格式化的方式来显示所有文档*
 
@@ -374,7 +374,7 @@ Jobs> db.Jobs.find().pretty()
 ]
 ```
 
-#### 3.3.3、删除（Delete）名为`Jobs`的数据库
+#### 3.3.3、删除（Delete）名为`Jobs`的数据库 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```bash
 Jobs> show dbs
@@ -392,7 +392,7 @@ local    40.00 KiB
 Jobs> 
 ```
 
-#### 3.3.4、更新（Update）名为`Jobs`的数据库
+#### 3.3.4、更新（Update）名为`Jobs`的数据库 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 *语法*
 
@@ -474,3 +474,4 @@ Jobs>
 
 
 
+<a id="🔚" href="#前言" style="font-size:17px; color:green; font-weight:bold;">我是有底线的➤点我回到首页</a>
