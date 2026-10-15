@@ -28,6 +28,8 @@
 
 ## 三、执行前检查 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
+当前脚本内已包含 [**Homebrew**](https://brew.sh/) 健康发现与激活函数，不依赖外置环境模块。仅验证并复用已有安装；Homebrew 分支不可用时继续原有的其他 Ruby 环境检测；不为了可选分支重新安装管理器。
+
 - 确认当前系统为 MacOS，并已安装脚本实际调用的工具。
 - 确认脚本路径、工程目录、输入文件和当前 Git 工作区正确。
 - 打开主脚本检查其中的业务命令，不理解的操作不要直接执行。
