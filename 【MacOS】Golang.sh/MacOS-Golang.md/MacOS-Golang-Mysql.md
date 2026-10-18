@@ -2,7 +2,23 @@
 
 ![Jobs出品，必属精品](https://picsum.photos/1500/400)
 
-[toc]
+<!-- jobs-toc:start -->
+<!-- jobs-toc:source {"v":2,"token":"[toc]"} -->
+<details>
+<summary>📚 目录（点击展开 / 收起）</summary>
+
+- [1、本地查看 Mysql 数据库](#jobs-toc-heading-1)
+  - [1.1、启动/关闭/重启 Mysql 服务（大前提）](#jobs-toc-heading-2)
+  - [1.2、命令行进入 Mysql 数据库](#jobs-toc-heading-3)
+- [2、下载 Mysql 的驱动包](#jobs-toc-heading-4)
+- [3、建表和字段](#jobs-toc-heading-5)
+- [4、数据库的操作代码](#jobs-toc-heading-6)
+  - [4.1、对数据的增（insert）操作](#jobs-toc-heading-7)
+  - [4.2、实现对数据的删（delete）操作](#jobs-toc-heading-8)
+  - [4.3、实现对数据库的改（update）操作](#jobs-toc-heading-9)
+
+</details>
+<!-- jobs-toc:end -->
 
 - [利用 Golang 向 Mysql 数据库 增/删/改 数据](#利用-golang-向-mysql-数据库-增删改-数据)
   - [1、本地查看 Mysql 数据库](#1本地查看-mysql-数据库)
@@ -19,11 +35,11 @@
 
 [go语言中文网/在golang中操作mysql数据库实现增删改操作](https://studygolang.com/articles/14642)
 
-## 1、本地查看 Mysql 数据库 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+## <span id="jobs-toc-heading-1" data-jobs-toc="v2">1、本地查看 Mysql 数据库 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 *参见 `MacOS-MySql.md`*
 
-### 1.1、**启动/关闭/重启 Mysql 服务（大前提）** <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+### <span id="jobs-toc-heading-2" data-jobs-toc="v2">1.1、**启动/关闭/重启 Mysql 服务（大前提）** <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 ```mysql
 brew services restart mysql // 重启MySQL
@@ -37,19 +53,19 @@ brew services start mysql // 启动MySQL
 (sudo) mysql.server restart // 重启MySQL
 ```
 
-### 1.2、**命令行进入 Mysql 数据库** <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+### <span id="jobs-toc-heading-3" data-jobs-toc="v2">1.2、**命令行进入 Mysql 数据库** <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 ```mysql
 MySQL -u root -p
 ```
 
-## 2、下载 Mysql 的驱动包 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+## <span id="jobs-toc-heading-4" data-jobs-toc="v2">2、下载 Mysql 的驱动包 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 ```go
 go get github.com/go-sql-driver/mysql
 ```
 
-## 3、建表和字段 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+## <span id="jobs-toc-heading-5" data-jobs-toc="v2">3、建表和字段 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 ```mysql
 CREATE TABLE IF NOT EXISTS `test`.`user` (
@@ -65,9 +81,9 @@ CREATE TABLE IF NOT EXISTS `test`.`user` (
  COMMENT = '用户表'
 ```
 
-## 4、数据库的操作代码 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+## <span id="jobs-toc-heading-6" data-jobs-toc="v2">4、数据库的操作代码 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-### 4.1、**对数据的增（insert）操作** <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+### <span id="jobs-toc-heading-7" data-jobs-toc="v2">4.1、**对数据的增（insert）操作** <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 ```go
 package main
@@ -103,7 +119,7 @@ func main(){
 }
 ```
 
-### 4.2、**实现对数据的删（delete）操作** <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+### <span id="jobs-toc-heading-8" data-jobs-toc="v2">4.2、**实现对数据的删（delete）操作** <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 ```go
 package main
@@ -138,7 +154,7 @@ func main(){
 }
 ```
 
-### 4.3、**实现对数据库的改（update）操作** <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+### <span id="jobs-toc-heading-9" data-jobs-toc="v2">4.3、**实现对数据库的改（update）操作** <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 ```go
 package main

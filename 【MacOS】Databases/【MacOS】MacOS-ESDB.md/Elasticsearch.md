@@ -2,9 +2,17 @@
 
 ![Jobs出品，必属精品](https://picsum.photos/1500/400)
 
-[TOC]
+<!-- jobs-toc:start -->
+<!-- jobs-toc:source {"v":2,"token":"[TOC]"} -->
+<details>
+<summary>📚 目录（点击展开 / 收起）</summary>
 
-## 1、使用`brew` 安装 `elasticsearch` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+- [1、使用brew 安装 elasticsearch](#jobs-toc-heading-1)
+
+</details>
+<!-- jobs-toc:end -->
+
+## <span id="jobs-toc-heading-1" data-jobs-toc="v2">1、使用`brew` 安装 `elasticsearch` <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 *相关资料*
 
