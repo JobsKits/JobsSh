@@ -30,11 +30,19 @@
 
 ## <span id="jobs-toc-heading-1" data-jobs-toc="v2">🔥 <font id=前言>前言</font></span><!-- jobs-toc:heading-end -->
 
-`【MacOS】Tomcat_Config.sh` 用于执行“【MacOS】Tomcat_Config”对应的 MacOS 自动化流程。主脚本与本 `README.md` 必须保持在同一目录，运行前先阅读影响范围。
+检查并管理真正的 [**Apache Tomcat**](https://tomcat.apache.org/)；使用 [**Homebrew**](https://brew.sh/) 安装及管理用户级服务。
+
+按选择安装或升级 Tomcat；查询、启动或停止用户级服务，不调用 `apachectl`。
+
+| 入口速览 | 实际行为 |
+| --- | --- |
+| 操作顺序 | 检查 Homebrew / Tomcat / Java → 可选安装升级 → 回车仅查询；`start` 启动；`stop` 停止。 |
+| 交互 | 自述回车继续；安装升级回车跳过；服务操作仅接受回车、start、stop。 |
+| 依赖 | Homebrew → Tomcat / OpenJDK，使用真实 catalina 命令复检。 |
 
 ## <span id="jobs-toc-heading-2" data-jobs-toc="v2">一、适用场景 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-- 需要执行“【MacOS】Tomcat_Config”所描述的本机开发或维护任务。
+- 检查并管理真正的 [**Apache Tomcat**](https://tomcat.apache.org/)；使用 [**Homebrew**](https://brew.sh/) 安装及管理用户级服务。
 - 希望通过可重复运行的 Shell 脚本减少手工命令遗漏。
 - 需要结合终端日志定位环境、路径或第三方工具问题。
 
@@ -63,34 +71,33 @@
 
 ### <span id="jobs-toc-heading-7" data-jobs-toc="v2">4.2、终端运行 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
+在当前 README 所在目录运行：
+
 ```shell
-cd "脚本所在目录/【MacOS】Tomcat_Config.sh"
-./【MacOS】Tomcat_Config.sh
+zsh ./【MacOS】Tomcat_Config.sh
 ```
 
 ## <span id="jobs-toc-heading-8" data-jobs-toc="v2">五、操作流程 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-1. 展示脚本自述或同目录 `README.md`。
-2. 检查运行环境、输入参数和目标路径。
-3. 按脚本提示确认需要执行的业务步骤。
-4. 输出执行结果、失败原因和日志位置。
+1、展示内置自述并确认，随后初始化日志。
+
+2、检查 Homebrew 与 Tomcat；仅选择后安装或升级，缺失却跳过时停止。
+
+3、动态解析 Tomcat 与 `openjdk` 路径，验证 Java 和 `catalina version`，失败即停止。
+
+4、服务选择直接回车只执行 `brew services info tomcat`；输入 `start` 执行 `brew services start tomcat`，输入 `stop` 执行对应停止命令。
+
+5、读取操作后的服务状态并提示配置位置；命令成功不代表 HTTP 已就绪，继续按实际端口和 Tomcat 日志核对。
 
 ## <span id="jobs-toc-heading-9" data-jobs-toc="v2">六、风险说明 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-- 脚本包含 `sudo`，可能要求输入当前 MacOS 用户密码。
-- 脚本可能修改文件权限或 MacOS 安全属性。
 
-危险操作必须以脚本中的 `YES` 确认为准；如果脚本尚未提供明确确认，应先审查脚本内容，不要盲目执行。
+- `start` 使用用户级 Homebrew 服务，会注册登录启动；`stop` 同时停止并取消注册。
+- 不覆盖 `server.xml`、默认端口或已有 Web 应用；端口冲突需要人工处理。
 
 ## <span id="jobs-toc-heading-10" data-jobs-toc="v2">七、日志文件 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-Jobs 标准脚本日志默认写入：
-
-```text
-$TMPDIR/【MacOS】Tomcat_Config.log
-```
-
-如果脚本内部另有 `LOG_FILE` 定义，以主脚本实际配置为准。
+日志追加到系统临时目录中的 `【MacOS】Tomcat_Config.log`，运行自述会显示实际位置。日志文件使用当前用户私有权限，非终端和日志均为纯文本。
 
 ## <span id="jobs-toc-heading-11" data-jobs-toc="v2">八、常见问题 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
@@ -108,6 +115,8 @@ $TMPDIR/【MacOS】Tomcat_Config.log
 
 ## <span id="jobs-toc-heading-15" data-jobs-toc="v2">九、未执行声明 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-README 只描述脚本职责和通用风险，不代表已经在当前 MacOS 环境执行真实业务命令。交付前应至少通过对应 Shell 的静态语法检查。
+静态语法及隔离夹具验证用于检查输入、失败和文件保护分支，不代表已在当前机器执行真实安装、服务启动或系统文件写入。
+
+安装与服务命令依据 [Homebrew Tomcat 公式](https://formulae.brew.sh/formula/tomcat)。旧入口名保持兼容；源码不再把系统 Apache 当作 Tomcat。
 
 <a id="🔚" href="#前言" style="font-size:17px; color:green; font-weight:bold;">我是有底线的➤点我回到首页</a>

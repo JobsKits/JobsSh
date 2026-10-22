@@ -30,11 +30,19 @@
 
 ## <span id="jobs-toc-heading-1" data-jobs-toc="v2">🔥 <font id=前言>前言</font></span><!-- jobs-toc:heading-end -->
 
-`【MacOS】HEIC2Jpg.sh` 用于执行“【MacOS】HEIC2Jpg”对应的 MacOS 自动化流程。主脚本与本 `README.md` 必须保持在同一目录，运行前先阅读影响范围。
+使用 [**macOS**](https://www.apple.com/macos/) 自带 `sips` 将一个或多个目录中的 HEIC 转换为 JPEG。
+
+只扫描输入目录的第一层普通 HEIC 文件，保留原图，不覆盖已有 JPEG。
+
+| 入口速览 | 实际行为 |
+| --- | --- |
+| 操作顺序 | 拖入输入目录 → 选择输出目录（默认首目录下 `JPEG`）→ 转换并汇总成功 / 跳过 / 失败。 |
+| 交互 | 自述回车继续；拖入输入目录后选择输出目录，已有目标自动跳过。 |
+| 范围 | 只扫描输入目录的第一层普通 HEIC 文件，保留原图，不覆盖已有 JPEG。 |
 
 ## <span id="jobs-toc-heading-2" data-jobs-toc="v2">一、适用场景 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-- 需要执行“【MacOS】HEIC2Jpg”所描述的本机开发或维护任务。
+- 使用 macOS 自带 `sips` 将一个或多个目录中的 HEIC 转换为 JPEG。
 - 希望通过可重复运行的 Shell 脚本减少手工命令遗漏。
 - 需要结合终端日志定位环境、路径或第三方工具问题。
 
@@ -63,33 +71,33 @@
 
 ### <span id="jobs-toc-heading-7" data-jobs-toc="v2">4.2、终端运行 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
+在当前 README 所在目录运行：
+
 ```shell
-cd "脚本所在目录/【MacOS】HEIC2Jpg.sh"
-./【MacOS】HEIC2Jpg.sh
+zsh ./【MacOS】HEIC2Jpg.sh
 ```
 
 ## <span id="jobs-toc-heading-8" data-jobs-toc="v2">五、操作流程 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-1. 展示脚本自述或同目录 `README.md`。
-2. 检查运行环境、输入参数和目标路径。
-3. 按脚本提示确认需要执行的业务步骤。
-4. 输出执行结果、失败原因和日志位置。
+1、展示内置自述并等待回车，确认后初始化日志。
+
+2、拖入一个或多个目录，支持中文、空格、引号与 Finder 转义路径；仅处理第一层，不递归子目录。
+
+3、选择一个输出目录，回车使用首个输入目录下的 `JPEG`。
+
+4、使用 `find -print0` 遍历 HEIC，临时转换成功后才发布 `.jpg`。同名目标已存在时保留并跳过。
+
+5、输出总数、成功数、跳过数和失败数；任一文件失败时最终返回非零状态，空目录明确提示无数据。
 
 ## <span id="jobs-toc-heading-9" data-jobs-toc="v2">六、风险说明 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-- 脚本执行前应阅读终端自述，并通过 `Ctrl+C` 取消任何不确定操作。
 
-危险操作必须以脚本中的 `YES` 确认为准；如果脚本尚未提供明确确认，应先审查脚本内容，不要盲目执行。
+- 多个输入目录有同名 HEIC 时，后续同名输出会跳过；输出与输入可同目录，但不会覆盖文件。
+- 转换结果取决于系统解码器；失败时保留原图，不发布不完整 JPEG。
 
 ## <span id="jobs-toc-heading-10" data-jobs-toc="v2">七、日志文件 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-Jobs 标准脚本日志默认写入：
-
-```text
-$TMPDIR/【MacOS】HEIC2Jpg.log
-```
-
-如果脚本内部另有 `LOG_FILE` 定义，以主脚本实际配置为准。
+日志追加到系统临时目录中的 `【MacOS】HEIC2Jpg.log`，运行自述会显示实际位置。日志文件使用当前用户私有权限，非终端和日志均为纯文本。
 
 ## <span id="jobs-toc-heading-11" data-jobs-toc="v2">八、常见问题 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
@@ -107,6 +115,8 @@ $TMPDIR/【MacOS】HEIC2Jpg.log
 
 ## <span id="jobs-toc-heading-15" data-jobs-toc="v2">九、未执行声明 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-README 只描述脚本职责和通用风险，不代表已经在当前 MacOS 环境执行真实业务命令。交付前应至少通过对应 Shell 的静态语法检查。
+静态语法及隔离夹具验证用于检查输入、失败和文件保护分支，不代表已在当前机器执行真实安装、服务启动或系统文件写入。
+
+输入与输出在运行时选择，源码不含固定桌面路径。
 
 <a id="🔚" href="#前言" style="font-size:17px; color:green; font-weight:bold;">我是有底线的➤点我回到首页</a>

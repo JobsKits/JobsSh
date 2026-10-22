@@ -30,7 +30,7 @@
 
 ## <span id="jobs-toc-heading-1" data-jobs-toc="v2">🔥 <font id=前言>前言</font></span><!-- jobs-toc:heading-end -->
 
-`【MacOS】Tomcat_Config.sh` 用于执行“【MacOS】Tomcat_Config”对应的 MacOS 自动化流程。主脚本与本 `README.md` 必须保持在同一目录，运行前先阅读影响范围。
+`【MacOS】Tomcat_Config.sh` 是当前分类目录中的相对符号链接，统一运行 [`../../【MacOS】Tomcat_Config.sh/【MacOS】Tomcat_Config.sh`](../../【MacOS】Tomcat_Config.sh/【MacOS】Tomcat_Config.sh)。用途、依赖、风险和交互以[主脚本说明](../../【MacOS】Tomcat_Config.sh/README.md)为准；本入口复用主脚本的内置自述和确认，不保存第二份实现。移动或克隆时须保留整个仓库的相对目录结构。
 
 ## <span id="jobs-toc-heading-2" data-jobs-toc="v2">一、适用场景 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
@@ -42,7 +42,7 @@
 
 ```text
 【MacOS】Tomcat_Config.sh/
-├── 【MacOS】Tomcat_Config.sh
+├── 【MacOS】Tomcat_Config.sh -> ../../【MacOS】Tomcat_Config.sh/【MacOS】Tomcat_Config.sh
 └── README.md
 ```
 
@@ -57,21 +57,24 @@
 
 ### <span id="jobs-toc-heading-6" data-jobs-toc="v2">4.1、双击运行 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-在 Finder 中打开当前目录并双击 `【MacOS】Tomcat_Config.sh`。阅读终端自述后按回车继续，按 `Ctrl+C` 取消。
+在 [**Finder**](https://support.apple.com/zh-cn/guide/mac-help/mchlp2605/mac) 中打开当前目录，可通过此链接定位主脚本。若 `.sh` 被关联到编辑器，请使用下面的终端命令。进入主脚本后只显示一套自述和确认，按 `Ctrl+C` 取消。
 
 ### <span id="jobs-toc-heading-7" data-jobs-toc="v2">4.2、终端运行 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 ```shell
-cd "脚本所在目录/【MacOS】Tomcat_Config.sh"
-./【MacOS】Tomcat_Config.sh
+# 在本 README 所在目录运行：
+/bin/zsh "./【MacOS】Tomcat_Config.sh"
 ```
 
 ## <span id="jobs-toc-heading-8" data-jobs-toc="v2">五、操作流程 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-1. 展示脚本自述或同目录 `README.md`。
-2. 检查运行环境、输入参数和目标路径。
-3. 按脚本提示确认需要执行的业务步骤。
-4. 输出执行结果、失败原因和日志位置。
+1、通过相对链接进入主脚本，展示主脚本写死的内置自述。
+
+2、检查运行环境、输入参数和目标路径。
+
+3、按脚本提示确认需要执行的业务步骤。
+
+4、输出执行结果、失败原因和日志位置。
 
 ## <span id="jobs-toc-heading-9" data-jobs-toc="v2">六、风险说明 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
@@ -81,13 +84,7 @@ cd "脚本所在目录/【MacOS】Tomcat_Config.sh"
 
 ## <span id="jobs-toc-heading-10" data-jobs-toc="v2">七、日志文件 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-Jobs 标准脚本日志默认写入：
-
-```text
-$TMPDIR/【MacOS】Tomcat_Config.log
-```
-
-如果脚本内部另有 `LOG_FILE` 定义，以主脚本实际配置为准。
+本入口不单独创建日志。主脚本会在内置自述或执行结果中显示实际日志位置，默认保存在系统临时目录；具体命名以[主脚本说明](../../【MacOS】Tomcat_Config.sh/README.md)和源码中的 `LOG_FILE` 为准。
 
 ## <span id="jobs-toc-heading-11" data-jobs-toc="v2">八、常见问题 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 

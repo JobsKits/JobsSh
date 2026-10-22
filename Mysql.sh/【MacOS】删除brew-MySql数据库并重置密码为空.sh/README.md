@@ -30,11 +30,11 @@
 
 ## <span id="jobs-toc-heading-1" data-jobs-toc="v2">🔥 <font id=前言>前言</font></span><!-- jobs-toc:heading-end -->
 
-`【MacOS】删除brew-MySql数据库并重置密码为空.sh` 用于执行“【MacOS】删除brew-MySql数据库并重置密码为空”对应的 MacOS 自动化流程。主脚本与本 `README.md` 必须保持在同一目录，运行前先阅读影响范围。
+`【MacOS】删除brew-MySql数据库并重置密码为空.sh` 用于为本机开发环境重建 [**MySQL**](https://dev.mysql.com/doc/) 数据目录和账户，使用 `--initialize-insecure` 创建空密码 `root@localhost`。旧数据整体移为同级备份，只有真实 socket 登录并核对数据目录成功后才报告完成。主脚本可独立运行；本 `README.md` 用于运行前阅读，运行时自述直接写在脚本中。
 
 ## <span id="jobs-toc-heading-2" data-jobs-toc="v2">一、适用场景 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-- 需要执行“【MacOS】删除brew-MySql数据库并重置密码为空”所描述的本机开发或维护任务。
+- 明确需要重建全部本地数据库和账户、并暂时使用 root 空密码的开发环境。
 - 希望通过可重复运行的 Shell 脚本减少手工命令遗漏。
 - 需要结合终端日志定位环境、路径或第三方工具问题。
 
@@ -50,7 +50,7 @@
 
 ## <span id="jobs-toc-heading-4" data-jobs-toc="v2">三、执行前检查 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-当前脚本内已包含 [**Homebrew**](https://brew.sh/) 自检、安装路径选择和当前终端激活函数，不依赖外置环境模块。先验证 Homebrew 命令层、真实前缀与 `shellenv`；健康安装直接复用。缺失时输入精确大写 `YES` 选择系统目录，其他输入（含回车）选择用户目录；失败后停止，不自动切换目录。已有软件是否更新仍遵循原业务提示，不批量升级无关公式。
+当前脚本内包含 [**Homebrew**](https://brew.sh/) 健康发现与当前进程激活，不依赖外置模块。仅复用已有健康安装及 MySQL 程序；缺失或损坏时停止，首次安装请使用 `../【MacOS】JobsSql.sh/【MacOS】JobsSql.sh`。
 
 - 确认当前系统为 MacOS，并已安装脚本实际调用的工具。
 - 确认脚本路径、工程目录、输入文件和当前 Git 工作区正确。
@@ -72,28 +72,30 @@ cd "脚本所在目录/【MacOS】删除brew-MySql数据库并重置密码为空
 
 ## <span id="jobs-toc-heading-8" data-jobs-toc="v2">五、操作流程 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-1. 展示脚本自述或同目录 `README.md`。
-2. 检查运行环境、输入参数和目标路径。
-3. 按脚本提示确认需要执行的业务步骤。
-4. 输出执行结果、失败原因和日志位置。
+1、显示固定内置自述并等待回车；随后检查已有健康 Homebrew 与 MySQL，多版本时选择完整公式名。
+
+2、读取 MySQL 实际配置，要求数据目录为当前 Homebrew 默认 `var/mysql`、认证正常启用、经典协议及启用的 X Protocol 仅监听回环地址。
+
+3、展示影响范围；只有精确输入 `YES` 才重建全部数据库和账户，其它输入取消。
+
+4、记录原服务状态并停止服务；任何 mysqld / mysqld_safe 仍运行或进程检查失败时停止，不移动数据。
+
+5、将旧目录完整移至 `mysql.jobs-backup-日期时间-进程号`，再用同一 MySQL 程序的 `--no-defaults --initialize-insecure` 初始化新目录，不修改认证配置。
+
+6、启动服务，并用忽略用户密码配置的本地 socket 实际连接验证 `root@localhost` 空密码和新数据目录。失败或中断时保留失败的新目录并尝试恢复旧目录、原服务状态。
+
+7、成功后显示日志和备份位置，提醒及时设置 root 密码；历史备份不会自动删除。初始化行为依据 [MySQL 官方数据目录初始化说明](https://dev.mysql.com/doc/refman/8.4/en/data-directory-initialization.html)。
 
 ## <span id="jobs-toc-heading-9" data-jobs-toc="v2">六、风险说明 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-- 脚本包含 `sudo`，可能要求输入当前 MacOS 用户密码。
-- 脚本包含删除、清理或重置动作，执行前必须确认目标路径和影响范围。
-- 脚本可能访问网络、下载文件或更新本机工具链。
-
-危险操作必须以脚本中的 `YES` 确认为准；如果脚本尚未提供明确确认，应先审查脚本内容，不要盲目执行。
+- 重置后全部原数据库、账户和密码从新实例中消失；旧目录备份需手工保留和核对，恢复时必须先停止服务。
+- 仅支持默认数据目录和回环监听；自定义目录、符号链接、远程监听及启用 `skip-grant-tables` 的配置均会被拒绝。
+- 不会通过禁用认证假装密码已清空，也不会自动卸载或重新安装 MySQL。已有程序不可用时停止并提示修复。
+- 空密码只适用于临时本机开发；请尽快在交互客户端设置密码。
 
 ## <span id="jobs-toc-heading-10" data-jobs-toc="v2">七、日志文件 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-Jobs 标准脚本日志默认写入：
-
-```text
-$TMPDIR/【MacOS】删除brew-MySql数据库并重置密码为空.log
-```
-
-如果脚本内部另有 `LOG_FILE` 定义，以主脚本实际配置为准。
+确认自述后创建系统临时目录中的 `【MacOS】删除brew-MySql数据库并重置密码为空.log`，并同步显示在终端。外部命令输出会过滤 ANSI 和常见密码、Token、URL 凭据及查询参数；不记录交互登录密码。日志文件为当前用户私有权限，后一次运行会覆盖同名日志。
 
 ## <span id="jobs-toc-heading-11" data-jobs-toc="v2">八、常见问题 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
@@ -103,7 +105,7 @@ $TMPDIR/【MacOS】删除brew-MySql数据库并重置密码为空.log
 
 ### <span id="jobs-toc-heading-13" data-jobs-toc="v2">8.2、提示权限不足 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-检查目标文件权限和目录归属。只有确认命令及目标路径安全后，才按提示使用管理员权限。
+检查目标文件权限、目录归属和终端显示的实际前缀。配置、重置和卸载入口不通过 `sudo` 绕过目录保护；修复归属后重新运行。
 
 ### <span id="jobs-toc-heading-14" data-jobs-toc="v2">8.3、双击后没有继续执行 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
@@ -111,6 +113,6 @@ $TMPDIR/【MacOS】删除brew-MySql数据库并重置密码为空.log
 
 ## <span id="jobs-toc-heading-15" data-jobs-toc="v2">九、未执行声明 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-README 只描述脚本职责和通用风险，不代表已经在当前 MacOS 环境执行真实业务命令。交付前应至少通过对应 Shell 的静态语法检查。
+已进行 `zsh -n` 静态检查和隔离假命令分支验证；未真实安装、升级、启动/停止 MySQL、重建或删除数据库，也未执行 `sudo`。本地检查不能替代实际数据库备份与目标机器验收。
 
 <a id="🔚" href="#前言" style="font-size:17px; color:green; font-weight:bold;">我是有底线的➤点我回到首页</a>

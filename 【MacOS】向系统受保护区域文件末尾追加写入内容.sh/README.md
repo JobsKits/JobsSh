@@ -30,11 +30,19 @@
 
 ## <span id="jobs-toc-heading-1" data-jobs-toc="v2">🔥 <font id=前言>前言</font></span><!-- jobs-toc:heading-end -->
 
-`【MacOS】向系统受保护区域文件末尾追加写入内容.sh` 用于执行“【MacOS】向系统受保护区域文件末尾追加写入内容”对应的 MacOS 自动化流程。主脚本与本 `README.md` 必须保持在同一目录，运行前先阅读影响范围。
+向明确选择的现有普通文件追加一行文本，先备份、再核对并写回。
+
+精确输入 `YES` 才写回目标；必要时请求管理员权限，不关闭 SIP，不借桌面副本覆盖原文件。
+
+| 入口速览 | 实际行为 |
+| --- | --- |
+| 操作顺序 | 选择文件 → 输入内容 → `YES` → 同目录备份 → 并发检查 → 写回和校验。 |
+| 交互 | 自述回车继续；确认目标和文本后必须精确输入 YES 才写回。 |
+| 范围 | 精确输入 `YES` 才写回目标；必要时请求管理员权限，不关闭 SIP，不借桌面副本覆盖原文件。 |
 
 ## <span id="jobs-toc-heading-2" data-jobs-toc="v2">一、适用场景 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-- 需要执行“【MacOS】向系统受保护区域文件末尾追加写入内容”所描述的本机开发或维护任务。
+- 向明确选择的现有普通文件追加一行文本，先备份、再核对并写回。
 - 希望通过可重复运行的 Shell 脚本减少手工命令遗漏。
 - 需要结合终端日志定位环境、路径或第三方工具问题。
 
@@ -63,33 +71,35 @@
 
 ### <span id="jobs-toc-heading-7" data-jobs-toc="v2">4.2、终端运行 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
+在当前 README 所在目录运行：
+
 ```shell
-cd "脚本所在目录/【MacOS】向系统受保护区域文件末尾追加写入内容.sh"
-./【MacOS】向系统受保护区域文件末尾追加写入内容.sh
+zsh ./【MacOS】向系统受保护区域文件末尾追加写入内容.sh
 ```
 
 ## <span id="jobs-toc-heading-8" data-jobs-toc="v2">五、操作流程 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-1. 展示脚本自述或同目录 `README.md`。
-2. 检查运行环境、输入参数和目标路径。
-3. 按脚本提示确认需要执行的业务步骤。
-4. 输出执行结果、失败原因和日志位置。
+1、展示内置自述并确认，初始化私有日志；追加文本不会写进日志。
+
+2、拖入唯一现有普通文件，拒绝直接符号链接及多硬链接；空内容或无效输入停止。
+
+3、显示目标并要求精确大写 `YES`；回车或其它输入取消，EOF 停止。
+
+4、需要读取或写入权限时才请求 `sudo`；将原文件连同属性备份为目标旁的 `.jobs-backup.随机后缀`。
+
+5、在同目录临时副本追加内容；原文末尾没有换行时先补换行，再与备份比较，发现目标并发变化则保留当前状态并停止。
+
+6、原子替换目标后用 SHA-256 校验；中断清理未发布临时副本，备份保留用于人工恢复。
 
 ## <span id="jobs-toc-heading-9" data-jobs-toc="v2">六、风险说明 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-- 脚本执行前应阅读终端自述，并通过 `Ctrl+C` 取消任何不确定操作。
 
-危险操作必须以脚本中的 `YES` 确认为准；如果脚本尚未提供明确确认，应先审查脚本内容，不要盲目执行。
+- 写入系统配置可能影响服务。受 SIP 保护或无权限时停止，不尝试关闭保护。
+- 恢复前先检查后续改动，再将日志记录的原始备份复制回目标，按权限决定是否使用管理员命令。
 
 ## <span id="jobs-toc-heading-10" data-jobs-toc="v2">七、日志文件 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-Jobs 标准脚本日志默认写入：
-
-```text
-$TMPDIR/【MacOS】向系统受保护区域文件末尾追加写入内容.log
-```
-
-如果脚本内部另有 `LOG_FILE` 定义，以主脚本实际配置为准。
+日志追加到系统临时目录中的 `【MacOS】向系统受保护区域文件末尾追加写入内容.log`，运行自述会显示实际位置。日志文件使用当前用户私有权限，非终端和日志均为纯文本。
 
 ## <span id="jobs-toc-heading-11" data-jobs-toc="v2">八、常见问题 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
@@ -107,6 +117,8 @@ $TMPDIR/【MacOS】向系统受保护区域文件末尾追加写入内容.log
 
 ## <span id="jobs-toc-heading-15" data-jobs-toc="v2">九、未执行声明 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-README 只描述脚本职责和通用风险，不代表已经在当前 MacOS 环境执行真实业务命令。交付前应至少通过对应 Shell 的静态语法检查。
+静态语法及隔离夹具验证用于检查输入、失败和文件保护分支，不代表已在当前机器执行真实安装、服务启动或系统文件写入。
+
+备份位于目标同目录，可能包含敏感原文；沿用原文件属性。日志只记录路径和结果，不记录追加内容。
 
 <a id="🔚" href="#前言" style="font-size:17px; color:green; font-weight:bold;">我是有底线的➤点我回到首页</a>

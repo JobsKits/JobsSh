@@ -1,14 +1,120 @@
 #!/bin/zsh
 # 脚本自述：
 # - 脚本名称：【MacOS】GoProject.sh
-# - 核心用途：执行“GoProject”对应的自动化任务。
-# - 影响范围：可能修改当前项目、用户环境或脚本指定的目标。
-# - 运行提示：运行后会先打印内置自述；终端模式按回车确认后继续，按 Ctrl+C 可取消。
-# 打印脚本内置自述，并按运行入口决定是否等待用户确认。
-# >>> Jobs Homebrew install choice >>>
+# - 核心用途：创建 Go module 与 Gin /ping 示例，可选下载依赖、校验及运行。
+# - 影响范围：只新建所选父目录下的工程；现有目录一律保留，不修改 GOPATH 或 Shell 配置。
+# - 运行提示：先展示内置自述，回车继续；Ctrl+C 或 EOF 停止，危险操作要求 YES。
+# shell: zsh
+SCRIPT_SOURCE="${(%):-%x}"
+SCRIPT_PURPOSE='创建 Go module 与 Gin /ping 示例，可选下载依赖、校验及运行。'
+SCRIPT_IMPACT='只新建所选父目录下的工程；现有目录一律保留，不修改 GOPATH 或 Shell 配置。'
+
+# 显示内置自述，确认前只计算展示路径，不创建日志或改动环境。
+show_script_intro_and_wait() {
+  SCRIPT_PATH="${SCRIPT_SOURCE:A}"
+  SCRIPT_DIR="${SCRIPT_PATH:h}"
+  SCRIPT_BASENAME="${SCRIPT_PATH:t:r}"
+  LOG_FILE="${TMPDIR:-/tmp}/${SCRIPT_BASENAME}.log"
+  intro_line title "================ ${SCRIPT_BASENAME} ================"
+  intro_line body "核心用途：${SCRIPT_PURPOSE}"
+  intro_line body "影响范围：${SCRIPT_IMPACT}"
+  intro_line body "日志位置：${LOG_FILE}（确认后追加记录）"
+  intro_line body '按回车继续；Ctrl+C 或输入结束取消。安装、升级另行选择，直接回车跳过。'
+  [[ -t 0 ]] || { print -u2 -r -- '✖ 当前没有可交互输入，请在终端运行。'; exit 1; }
+  local answer
+  IFS= read -r 'answer?➤ 已了解用途与影响，按回车继续：' || exit 1
+}
+# 按终端能力渲染标题与正文，日志和非终端保持纯文本。
+intro_line() {
+  local role="$1" message="$2" style='0;34'
+  [[ "$role" != title ]] || style='1;31'
+  if [[ -t 1 && -n "${TERM:-}" && "${TERM:-}" != dumb && -z "${NO_COLOR+x}" ]]; then
+    printf '\033[%sm%s\033[0m\n' "$style" "$message"
+  else
+    print -r -- "$message"
+  fi
+}
+# 初始化当前进程选项及私有日志，不读取或改写 Shell 启动文件。
+initialize_script_runtime() {
+  setopt NO_NOMATCH TYPESET_SILENT ERR_EXIT PIPE_FAIL
+  umask 077
+  [[ ! -L "$LOG_FILE" && ( ! -e "$LOG_FILE" || ( -f "$LOG_FILE" && -O "$LOG_FILE" ) ) ]] || {
+    print -u2 -r -- "✖ 日志不是当前用户的普通文件：$LOG_FILE"; exit 1
+  }
+  : >> "$LOG_FILE"
+  chmod 600 "$LOG_FILE"
+  export HOMEBREW_NO_AUTO_UPDATE=1 NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0
+  log "ℹ 开始：$SCRIPT_PATH"
+  [[ "$(uname -s)" == Darwin ]] || die '仅支持 macOS。'
+}
+# 删除展示中的 ANSI 与 URL 凭据、查询参数，实际业务参数保持原样。
+sanitize_output() {
+  /usr/bin/perl -pe 's/\e\[[0-9;]*[A-Za-z]//g; s{(https?://)[^/\s\@]+\@}{$1***\@}g; s{(https?://[^\s?#]+)[?#][^\s]*}{$1?[redacted]}g'
+}
+# 同步输出可检索日志并保留纯文本。
+log() {
+  print -r -- "$*" | sanitize_output | tee -a "$LOG_FILE"
+}
+# 报告具体失败并停止后续业务。
+die() {
+  log "✖ $*"
+  exit 1
+}
+# 执行外部命令，记录脱敏输出并保留真实退出码。
+run_command() {
+  local result
+  local -a results
+  "$@" 2>&1 | sanitize_output | tee -a "$LOG_FILE"
+  results=("${pipestatus[@]}")
+  for result in "${results[@]}"; do
+    (( result == 0 )) || return "$result"
+  done
+  return 0
+}
+# 让普通写操作显式选择，回车跳过，EOF 终止整个脚本。
+ask_any_to_run() {
+  local answer
+  print -n -r -- "$1（回车跳过；输入任意字符执行）："
+  IFS= read -r answer || die '输入结束，已停止。'
+  [[ -n "$answer" ]]
+}
+# 保护危险操作，只有精确大写 YES 授权。
+confirm_yes() {
+  local answer
+  print -n -r -- "⚠ $1（输入 YES 执行，其它输入取消）："
+  IFS= read -r answer || die '输入结束，已停止。'
+  [[ "$answer" == YES ]]
+}
+# 解析 Finder 拖入的多个带引号或反斜杠路径，不求值执行输入。
+read_paths() {
+  local raw word
+  local -a words
+  print -n -r -- "$1"
+  IFS= read -r raw || die '输入结束，已停止。'
+  words=("${(@z)raw}")
+  PATH_INPUTS=()
+  PATH_INPUT_RAW=()
+  for word in "${words[@]}"; do
+    word="${(Q)word}"
+    word="${word%$'\r'}"
+    [[ "$word" != '~/'* ]] || word="$HOME/${word#\~/}"
+    if [[ -n "$word" ]]; then
+      PATH_INPUT_RAW+=("${word:a}")
+      PATH_INPUTS+=("${word:A}")
+    fi
+  done
+}
+# 在传输前说明对象、真实来源配置和目标。
+show_source() {
+  log "━━━━━━━━━━ 来源｜$1 ━━━━━━━━━━"
+  log "对象：$2"
+  log "来源：$3"
+  log "目标：$4"
+  log '━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+}
 # 输出安装诊断，避免混入返回的命令路径。
 jobs_brew_note() {
-  print -u2 -r -- "ℹ $*"
+  log "ℹ $*" >&2
 }
 # 验证候选能够执行；共享安装只读不代表未安装。
 jobs_brew_candidate_ok() {
@@ -67,8 +173,9 @@ jobs_brew_install_system() {
   local installer system_prefix="$(jobs_brew_system_prefix)" installer_result=0
   command -v curl >/dev/null 2>&1 || { jobs_brew_note "缺少 curl，无法获取官方安装器。"; return 1; }
   installer="$(mktemp "${TMPDIR:-/tmp}/jobs-homebrew-install.XXXXXX")" || return 1
-  if curl -fsSL --connect-timeout 10 --max-time 120 https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o "$installer"; then
-    /bin/bash "$installer" || installer_result=$?
+  show_source 下载 Homebrew安装器 https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh "$installer"
+  if run_command curl -fsSL --connect-timeout 10 --max-time 120 https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o "$installer"; then
+    run_command /bin/bash "$installer" || installer_result=$?
   else
     installer_result=1
   fi
@@ -97,14 +204,16 @@ jobs_brew_install_user() {
   export HOMEBREW_NO_SUDO=1
   mkdir -p "${prefix:h}" || return 1
   stage="$(mktemp -d "${prefix:h}/.jobs-homebrew.XXXXXX")" || return 1
-  if ! curl -fsSL --connect-timeout 10 --max-time 60 https://api.github.com/repos/Homebrew/brew/releases/latest -o "$stage/release.json"; then
+  show_source 下载 Homebrew稳定版 https://api.github.com/repos/Homebrew/brew/releases/latest "$stage/release.json"
+  if ! run_command curl -fsSL --connect-timeout 10 --max-time 60 https://api.github.com/repos/Homebrew/brew/releases/latest -o "$stage/release.json"; then
     rm -r -- "$stage"
     jobs_brew_note "获取官方稳定版本失败，停止安装。"
     return 1
   fi
   release_tag="$(sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([0-9][0-9.]*\)".*/\1/p' "$stage/release.json" | head -n 1)"
+  show_source 克隆 "Homebrew $release_tag" https://github.com/Homebrew/brew.git "$prefix"
   if [[ ! "$release_tag" =~ '^[0-9]+\.[0-9]+\.[0-9]+$' ]] ||
-     ! GIT_TERMINAL_PROMPT=0 "$git_bin" -c http.lowSpeedLimit=1 -c http.lowSpeedTime=60 clone --depth 1 --branch "$release_tag" --single-branch https://github.com/Homebrew/brew.git "$stage/brew" ||
+     ! run_command env GIT_TERMINAL_PROMPT=0 "$git_bin" -c http.lowSpeedLimit=1 -c http.lowSpeedTime=60 clone --depth 1 --branch "$release_tag" --single-branch https://github.com/Homebrew/brew.git "$stage/brew" ||
      ! "$git_bin" -C "$stage/brew" checkout -b stable ||
      ! "$git_bin" -C "$stage/brew" config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*' ||
      ! mkdir -p "$stage/brew/Cellar" "$stage/brew/Caskroom" "$stage/brew/etc" "$stage/brew/var"; then
@@ -125,33 +234,6 @@ jobs_brew_install_user() {
   typeset -g JOBS_HOMEBREW_BIN="$prefix/bin/brew"
   jobs_brew_candidate_ok "$JOBS_HOMEBREW_BIN" || { jobs_brew_note "用户目录安装后复检失败：$prefix"; return 1; }
 }
-# 只更新本模块的 shellenv 配置块，并保留配置文件的符号链接和权限。
-jobs_brew_save_shellenv() {
-  local profile_file="$HOME/.zprofile" profile_stage shellenv_line current_shell="${SHELL:-/bin/zsh}"
-  [[ "${current_shell##*/}" != bash ]] || profile_file="$HOME/.bash_profile"
-  shellenv_line='eval "$('"${(q)JOBS_HOMEBREW_BIN}"' shellenv)"'
-  profile_stage="$(mktemp "${TMPDIR:-/tmp}/jobs-homebrew-profile.XXXXXX")" || return 1
-  if [[ -e "$profile_file" || -L "$profile_file" ]]; then
-    awk '
-      $0 == "# >>> Jobs Homebrew shellenv >>>" { inside = 1; block = $0 ORS; next }
-      inside {
-        block = block $0 ORS
-        if ($0 == "# <<< Jobs Homebrew shellenv <<<") { inside = 0; block = "" }
-        next
-      }
-      { print }
-      END { if (inside) printf "%s", block }
-    ' "$profile_file" > "$profile_stage" || { rm -- "$profile_stage"; return 1; }
-  fi
-  {
-    print -r -- '# >>> Jobs Homebrew shellenv >>>'
-    print -rl -- "$shellenv_line" '# <<< Jobs Homebrew shellenv <<<'
-  } >> "$profile_stage"
-  if ! cmp -s "$profile_stage" "$profile_file"; then
-    cat "$profile_stage" > "$profile_file" || { rm -- "$profile_stage"; jobs_brew_note "无法写入用户配置：$profile_file"; return 1; }
-  fi
-  rm -- "$profile_stage"
-}
 # 激活当前进程并验证 Ruby 命令层；只有新安装才持久化 shellenv。
 jobs_brew_activate() {
   local brew_env
@@ -165,17 +247,14 @@ jobs_brew_activate() {
     if [[ "${JOBS_HOMEBREW_INSTALL_MODE:-}" == user && -z "${HOMEBREW_CASK_OPTS:-}" ]]; then
       export HOMEBREW_CASK_OPTS="--appdir=$HOME/Applications"
     fi
-    jobs_brew_save_shellenv || return 1
+    jobs_brew_note "Homebrew 当前进程已生效；独立工具未写 Shell 配置，后续运行会重新发现此前选择的安装位置。"
   fi
 }
 # 在原版安装位置复用或安装 Homebrew，安装失败必须终止外层业务。
 jobs_brew_install_or_exit() {
   local installed=""
-  if [[ "${DRY_RUN:-0}" == 1 ]]; then
-    jobs_brew_note "演练：Homebrew 系统路径 $(jobs_brew_system_prefix)；用户路径 ${JOBS_HOMEBREW_INSTALL_PREFIX:-$HOME/.local/homebrew}；未询问或执行安装。"
-    return 0
-  fi
   if ! JOBS_HOMEBREW_BIN="$(jobs_brew_find)"; then
+    ask_any_to_run "Homebrew 不可用，安装或修复" || die "Homebrew 未就绪，停止下游业务。"
     jobs_brew_choose_installation || exit 1
     case "$JOBS_HOMEBREW_INSTALL_MODE" in
       system) jobs_brew_install_system || exit 1 ;;
@@ -183,226 +262,112 @@ jobs_brew_install_or_exit() {
       *) jobs_brew_note "安装路径选择无效，停止。"; exit 1 ;;
     esac
     installed=installed
+    log "✔ Homebrew 来源：https://github.com/Homebrew/brew；安装位置：$JOBS_HOMEBREW_BIN"
   fi
   jobs_brew_activate "$installed" || exit 1
 }
-# <<< Jobs Homebrew install choice <<<
-show_script_intro_and_wait() {
-  print -r -- '============================== 脚本内置自述 =============================='
-  print -r -- '脚本名称：【MacOS】GoProject.sh'
-  print -r -- '核心用途：执行“GoProject”对应的自动化任务。'
-  print -r -- '影响范围：可能修改当前项目、用户环境或脚本指定的目标。'
-  print -r -- '取消方式：确认前按 Ctrl+C 终止，不会继续执行后续业务。'
-  print -r -- '============================================================================'
-  if [[ ! -t 0 ]]; then
-    print -u2 -r -- '当前没有可交互输入，请在终端中重新运行。'
-    exit 1
-  fi
-  read -r "?👉 已了解脚本用途与影响，按回车继续；按 Ctrl+C 取消：" _ || exit 1
+# 使用各工具真实支持的版本命令验证健康，Go 使用子命令 version。
+tool_is_healthy() {
+  local tool="$1" candidate="$2"
+  [[ -n "$candidate" && -x "$candidate" ]] || return 1
+  case "$tool" in
+    go) "$candidate" version >/dev/null 2>&1 && command -v gofmt >/dev/null 2>&1 && gofmt -h >/dev/null 2>&1 ;;
+    *) "$candidate" --version >/dev/null 2>&1 ;;
+  esac
 }
-# 执行入口下沉后的完整业务流程和控制逻辑。
-# 检测是否已经安装了brew
-# 🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛
-## 如果没有执行权限，在这个sh文件的目录下，执行chmod u+x *.sh
-## 加执行权限
-function addExe(){
-    
-    filePath=$(dirname $0)/$(basename $0)
-    # 输出当前步骤的提示或执行进度。
-    echo "我在这里：$filePath" 
-
-    # 定位📌于该文件的垂直文件夹
-    folderPath=$(dirname $0)
-    # 执行当前流程中的独立业务步骤：cd。
-    cd folderPath
-    # 加权限
-    fileFullName=$(basename $0)
-    # 执行当前流程中的独立业务步骤：chmod。
-    chmod u+x $fileFullName
-}
-## 通过 brew 安装 golong 语言环境，以及 IDE：vscode
-function sysGoConf() {
-<<'COMMENT'
-    【参考资料】
-    https://www.jianshu.com/p/7f9f73327fd8 Mac 安装 Golang 和 vscode
-    https://blog.csdn.net/OMars/article/details/125356173 git 安装
-COMMENT
-    echo '1、安装 brew '
-    jobs_brew_install_or_exit
-    echo '2、通过 brew 安装 golang 环境 '
-    brew install golang
-    brew info go
-    echo '3、通过 brew 安装 golang 开发IDE环境：visual-studio-code '
-    brew cask install visual-studio-code
-    open https://code.visualstudio.com/
-    echo '4、 vscode 中 Go 的相关插件安装'
-    cd $GOPATH/src/github.com/golang
-    git clone https://github.com/golang/tools.git tools
-}
-## 添加默认值（字符串）
-function defaultInput() {
-    result=${1}
-    if [${1} = ""]
-    then
-        # 什么都不输入，即默认值
-        result=$'Test'
-    fi  
-}
-## 配置项目依赖
-function dependenceConf(){
-    go get github.com/go-sql-driver/mysql ## mysql 的go语言驱动
-    go get -u -v github.com/kardianos/govendor ## 安装 govendor
-    # govendor -version ## 检查 govendor 是否安装成功
-}
-## 写文件内容
-function writeFileContent(){
-    # Todo
-    echo ''
-}
-## 写入环境变量
-## 在 ~/.bash_profile 文件内部搜索是否包含 GOPATH（全匹配：包括大小写和文字）
-function GOPATHConf(){
-<<'COMMENT'
-grep返回的退出状态为0，表示成功。 
-退出状态为1，表示没有找到。 
-如果找不到指定的文件，退出状态为2
-COMMENT
-
-<<'COMMENT'
-大于 -gt (greater than)
-小于 -lt (less than)
-大于或等于 -ge (greater than or equal)
-小于或等于 -le (less than or equal)
-不相等 -ne （not equal）
-相等 -eq （equal）
-COMMENT
-
-    # 搜索不成功，说明还没有被写入，则写入【防止过度写入】
-    # 配置文件更新以后不会自动刷新UI，需要重新open，才可以看到实时数据
-    grep GOPATH ~/.bash_profile
-    if [ $? -ne 0 ] ;then
-        echo 'export PATH="$GOPATH/bin:$PATH"' >> ~/.bash_profile
-        source ~/.bash_profile
+# 按健康状态和显式选择安装或升级当前业务依赖，不更新其它软件。
+ensure_formula_tool() {
+  local tool="$1" formula="$2" candidate
+  candidate="$(command -v "$tool" 2>/dev/null || true)"
+  if tool_is_healthy "$tool" "$candidate"; then
+    log "✔ 已复用健康工具：$candidate"
+    if ask_any_to_run "升级 Homebrew 管理的 $formula"; then
+      "$JOBS_HOMEBREW_BIN" list --versions "$formula" >/dev/null 2>&1 || die "$tool 来自其它来源，请使用原安装方式升级。"
+      show_source 升级 "$formula" 'Homebrew 当前配置的软件源（最终下载地址由 brew 解析）' "$JOBS_HOMEBREW_PREFIX"
+      run_command "$JOBS_HOMEBREW_BIN" upgrade "$formula" || die "$formula 升级失败。"
     fi
-
-    grep GOPATH ~/.zshrc
-    if [ $? -ne 0 ] ;then
-        echo 'export PATH=$PATH:$GOPATH/bin' >> ~/.zshrc
-        source ~/.zshrc
-    fi
-}
-## 生成一些配置说明文件
-function localGoEnvInfo(){
-    ### 先清空
-    echo "" > localGoEnvInfo.md
-    ### 再写入
-    echo "【❤️golang的环境配置】" >> localGoEnvInfo.md
-    go env >> localGoEnvInfo.md
-    echo "【❤️OS的环境变量】" >> localGoEnvInfo.md
-    sed 's/:/\n/g' <<< "$PATH" >> localGoEnvInfo.md
-    open localGoEnvInfo.md
-}
-## 项目初始化
-function projInit(){
-    # 📌定位到桌面
-    cd Desktop/
-    # 先定义项目文件夹
-    printf '【自动化前置部署Go项目】\n\n'
-    # 读取键盘输入，回车结束监听记录
-    echo "【温馨提示：如果什么都没有输入，那么启用默认文件夹名Test】"
-    read "?请输入项目文件夹名字,以回车结束:" folder_name
-
-    defaultInput $folder_name
-    folder_name=${result}
-    # echo "The value of var is ${result}"
-
-    mkdir ${folder_name}
-    echo -n "已经在桌面建立一个名为:${folder_name}的文件夹，并打开他"
-    open ${folder_name} 
-    # 📌定位到刚才创立的项目文件夹
-    cd ${folder_name}
-    # 用mod管理项目
-<<'COMMENT'
-go.mod文件一旦创建后，它的内容将会被go toolchain全面掌控。
-go toolchain会在各类命令执行时，比如go get、go build、go mod等修改和维护go.mod文件。
-COMMENT
-    go mod init gone
-    # 用Visual Studio Code作为IDE编辑代码[可以放在最后]
-    code .
-}
-
-# 🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛🌛
-
-
-# 读取键盘输入，回车结束监听记录
-
-file_name=${result}
-# echo "The value of var is ${result}"
-
-# 新建一个文件，命名为Test
-file_name=$file_name".go"
-# writeFileContent ${file_name} # 写内容到文件
-# 编排脚本的高层业务流程。
-# 初始化脚本运行环境，并集中承载原有的顶层执行逻辑。
-run_main_business_flow() {
-  if ! command -v brew &> /dev/null
-  then
-      # 输出当前步骤的提示或执行进度。
-      echo "brew 未安装，开始安装..."
-      # 执行当前流程中的独立业务步骤：open。
-      open https://brew.sh/
-      # 执行当前流程中的独立业务步骤：处理当前语句。
-      jobs_brew_install_or_exit
-      ## brew环境变量设置
-      # 安装帮助函数已按用户选择持久化实际 shellenv。
-      # 执行当前流程中的独立业务步骤：open。
-      open /Users/$(whoami)/.zprofile
-      # 执行当前流程中的独立业务步骤：eval。
-      eval "$("${JOBS_HOMEBREW_BIN:-$(jobs_brew_find)}" shellenv)"
   else
-      # 输出当前步骤的提示或执行进度。
-      echo "brew 已经安装，跳过安装步骤。"
-      ## brew 升级
-      brew update
-      # 执行当前流程中的独立业务步骤：brew。
-      brew doctor
-      # 执行当前流程中的独立业务步骤：brew。
-      brew -v
+    ask_any_to_run "安装或修复 $formula" || die "$tool 未就绪，已停止。"
+    show_source 安装 "$formula" 'Homebrew 当前配置的软件源（最终下载地址由 brew 解析）' "$JOBS_HOMEBREW_PREFIX"
+    if "$JOBS_HOMEBREW_BIN" list --versions "$formula" >/dev/null 2>&1; then
+      run_command "$JOBS_HOMEBREW_BIN" reinstall "$formula" || die "$formula 修复失败。"
+    else
+      run_command "$JOBS_HOMEBREW_BIN" install "$formula" || die "$formula 安装失败。"
+    fi
   fi
-  projInit # 项目初始化
-  echo "【温馨提示：如果什么都没有输入，那么启用默认文件名Test】"
-  read "?请输入新建文件名字，以回车结束:" file_name
-  defaultInput $file_name
-  Touch $file_name
-  echo ${file_name}
-  cat>${file_name}<<EOF
+  rehash
+  candidate="$(command -v "$tool" 2>/dev/null || true)"
+  tool_is_healthy "$tool" "$candidate" || die "$tool 安装后健康复检失败。"
+}
+# 验证 Go 依赖，复用健康环境或按选择仅修复当前依赖。
+prepare_go_environment() {
+  jobs_brew_install_or_exit
+  ensure_formula_tool go go
+}
+# 收集工程参数并在任何生成动作前拒绝现有目标。
+collect_go_project() {
+  read_paths '工程父目录（回车使用脚本目录下的 GeneratedProjects）：'
+  (( ${#PATH_INPUTS} <= 1 )) || die '只能指定一个父目录。'
+  PROJECT_PARENT="${PATH_INPUTS[1]:-$SCRIPT_DIR/GeneratedProjects}"
+  local name source_name
+  IFS= read -r 'name?工程文件夹名（回车 Test）：' || die '输入结束，已停止。'
+  name="${name:-Test}"
+  [[ "$name" != . && "$name" != .. && "$name" != */* && "$name" != *$'\n'* ]] || die '工程名不能包含路径分隔符或换行。'
+  PROJECT_DIR="$PROJECT_PARENT/$name"
+  [[ ! -e "$PROJECT_DIR" && ! -L "$PROJECT_DIR" ]] || die "目标已存在，不覆盖：$PROJECT_DIR"
+  IFS= read -r 'MODULE_NAME?Go module 路径（回车 example.com/demo）：' || die '输入结束，已停止。'
+  MODULE_NAME="${MODULE_NAME:-example.com/demo}"
+  [[ "$MODULE_NAME" =~ '^[A-Za-z0-9][A-Za-z0-9._/-]*$' && "$MODULE_NAME" != */ && "$MODULE_NAME" != *'..'* && "$MODULE_NAME" != *'//'* ]] || die 'module 路径含无效字符。'
+  IFS= read -r 'source_name?源码文件名（回车 main.go）：' || die '输入结束，已停止。'
+  SOURCE_NAME="${source_name:-main.go}"
+  [[ "$SOURCE_NAME" =~ '^[A-Za-z][A-Za-z0-9_]*\.go$' && "$SOURCE_NAME" != *_test.go ]] || die '源码必须是普通 .go 文件名，不能是测试文件。'
+}
+# 创建独立新工程，先解析依赖再执行可选运行，失败时保留诊断现场。
+create_go_project() {
+  mkdir -p "$PROJECT_PARENT" || die "无法创建父目录：$PROJECT_PARENT"
+  mkdir "$PROJECT_DIR" || die "工程目录创建失败：$PROJECT_DIR"
+  cd "$PROJECT_DIR" || die '进入工程目录失败。'
+  run_command go mod init "$MODULE_NAME" || die 'go mod init 失败。'
+  cat > "$SOURCE_NAME" <<'GO'
 package main
-import (
-    "github.com/gin-gonic/gin"
-)
+
+import "github.com/gin-gonic/gin"
+
 func main() {
-    r := gin.Default()
-    r.GET("/ping", func(c *gin.Context) {
-        c.JSON(200, gin.H{
-            "message": "pong",
-        })
+    router := gin.Default()
+    router.GET("/ping", func(context *gin.Context) {
+        context.JSON(200, gin.H{"message": "pong"})
     })
-    r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+    if err := router.Run("127.0.0.1:8080"); err != nil {
+        panic(err)
+    }
 }
-EOF
-  go run $file_name # ①下载写入内容的依赖。依赖下载完成，会生成go.sum文件
-  dependenceConf # ②下载本脚本文件头部配置的依赖。依赖下载完成，会生成go.sum文件
-  localGoEnvInfo # 生成一些配置说明文件
-  GOPATHConf # GOPATH 配置
+GO
+  run_command gofmt -w "$SOURCE_NAME" || die 'gofmt 失败。'
+  { printf '# Go 环境\n\n```text\n'; go version; go env GOPATH GOMOD GOPROXY; printf '```\n'; } | sanitize_output > localGoEnvInfo.md
+  log "✔ 已生成：$PROJECT_DIR"
+  if ask_any_to_run '下载 Gin 依赖并执行 go mod tidy / go test'; then
+    show_source 下载 Gin "Go module 当前 GOPROXY=$(go env GOPROXY)；github.com/gin-gonic/gin" "$PROJECT_DIR"
+    run_command go mod tidy || die '依赖解析失败；工程文件已保留。'
+    run_command go test ./... || die '工程校验失败；文件已保留。'
+    if ask_any_to_run '前台运行示例（127.0.0.1:8080，Ctrl+C 停止）'; then
+      run_command go run . || die '示例运行结束或启动失败，请检查端口及日志。'
+    fi
+  else
+    log 'ℹ 工程骨架已生成；首次运行前需在工程中执行 go mod tidy。'
+  fi
+  if command -v code >/dev/null 2>&1 && ask_any_to_run '使用当前 VS Code 打开工程'; then
+    run_command code "$PROJECT_DIR" || die '编辑器打开失败，工程已保留。'
+  fi
+  log "✔ 工程流程结束；日志：$LOG_FILE"
 }
-# 初始化 zsh 通配符策略。
-initialize_script_runtime() {
-  setopt NO_NOMATCH TYPESET_SILENT
-}
-# 编排脚本的高层业务流程。
+# 编排自述、初始化和独立业务步骤。
 main() {
-  show_script_intro_and_wait # 展示脚本内置自述，并按运行入口完成防误触确认。
-  initialize_script_runtime # 确认后初始化 zsh 运行选项。
-  run_main_business_flow "$@" # 执行脚本原有的完整业务流程。
+  show_script_intro_and_wait # 先展示用途与影响，确认前不写入。
+  initialize_script_runtime # 确认后初始化选项与日志。
+  prepare_go_environment # 在生成前验证 Homebrew、Go 及可选安装升级。
+  collect_go_project # 验证父目录、名称与 module 参数，禁止覆盖已有工程。
+  create_go_project # 生成模板并按选择下载依赖、校验和前台运行。
 }
+
 main "$@"

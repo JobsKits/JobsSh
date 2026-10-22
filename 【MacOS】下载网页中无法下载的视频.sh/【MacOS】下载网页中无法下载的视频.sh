@@ -1,18 +1,120 @@
 #!/bin/zsh
 # 脚本自述：
 # - 脚本名称：【MacOS】下载网页中无法下载的视频.sh
-# - 核心用途：执行“下载网页中无法下载的视频”对应的自动化任务。
-# - 影响范围：可能修改当前项目、用户环境或脚本指定的目标。
-# - 运行提示：运行后会先打印内置自述；终端模式按回车确认后继续，按 Ctrl+C 可取消。
-# 在任何原有 Homebrew 命令前完成当前脚本内的健康检查和激活。
-prepare_homebrew_runtime() {
-  jobs_brew_install_or_exit
+# - 核心用途：使用 you-get 下载指定 HTTP / HTTPS 网页中受支持的视频。
+# - 影响范围：可选安装依赖，仅写入所选输出目录；是否可下载取决于站点和媒体权限。
+# - 运行提示：先展示内置自述，回车继续；Ctrl+C 或 EOF 停止，危险操作要求 YES。
+# shell: zsh
+SCRIPT_SOURCE="${(%):-%x}"
+SCRIPT_PURPOSE='使用 you-get 下载指定 HTTP / HTTPS 网页中受支持的视频。'
+SCRIPT_IMPACT='可选安装依赖，仅写入所选输出目录；是否可下载取决于站点和媒体权限。'
+
+# 显示内置自述，确认前只计算展示路径，不创建日志或改动环境。
+show_script_intro_and_wait() {
+  SCRIPT_PATH="${SCRIPT_SOURCE:A}"
+  SCRIPT_DIR="${SCRIPT_PATH:h}"
+  SCRIPT_BASENAME="${SCRIPT_PATH:t:r}"
+  LOG_FILE="${TMPDIR:-/tmp}/${SCRIPT_BASENAME}.log"
+  intro_line title "================ ${SCRIPT_BASENAME} ================"
+  intro_line body "核心用途：${SCRIPT_PURPOSE}"
+  intro_line body "影响范围：${SCRIPT_IMPACT}"
+  intro_line body "日志位置：${LOG_FILE}（确认后追加记录）"
+  intro_line body '按回车继续；Ctrl+C 或输入结束取消。安装、升级另行选择，直接回车跳过。'
+  [[ -t 0 ]] || { print -u2 -r -- '✖ 当前没有可交互输入，请在终端运行。'; exit 1; }
+  local answer
+  IFS= read -r 'answer?➤ 已了解用途与影响，按回车继续：' || exit 1
 }
-# 打印脚本内置自述，并按运行入口决定是否等待用户确认。
-# >>> Jobs Homebrew install choice >>>
+# 按终端能力渲染标题与正文，日志和非终端保持纯文本。
+intro_line() {
+  local role="$1" message="$2" style='0;34'
+  [[ "$role" != title ]] || style='1;31'
+  if [[ -t 1 && -n "${TERM:-}" && "${TERM:-}" != dumb && -z "${NO_COLOR+x}" ]]; then
+    printf '\033[%sm%s\033[0m\n' "$style" "$message"
+  else
+    print -r -- "$message"
+  fi
+}
+# 初始化当前进程选项及私有日志，不读取或改写 Shell 启动文件。
+initialize_script_runtime() {
+  setopt NO_NOMATCH TYPESET_SILENT ERR_EXIT PIPE_FAIL
+  umask 077
+  [[ ! -L "$LOG_FILE" && ( ! -e "$LOG_FILE" || ( -f "$LOG_FILE" && -O "$LOG_FILE" ) ) ]] || {
+    print -u2 -r -- "✖ 日志不是当前用户的普通文件：$LOG_FILE"; exit 1
+  }
+  : >> "$LOG_FILE"
+  chmod 600 "$LOG_FILE"
+  export HOMEBREW_NO_AUTO_UPDATE=1 NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0
+  log "ℹ 开始：$SCRIPT_PATH"
+  [[ "$(uname -s)" == Darwin ]] || die '仅支持 macOS。'
+}
+# 删除展示中的 ANSI 与 URL 凭据、查询参数，实际业务参数保持原样。
+sanitize_output() {
+  /usr/bin/perl -pe 's/\e\[[0-9;]*[A-Za-z]//g; s{(https?://)[^/\s\@]+\@}{$1***\@}g; s{(https?://[^\s?#]+)[?#][^\s]*}{$1?[redacted]}g'
+}
+# 同步输出可检索日志并保留纯文本。
+log() {
+  print -r -- "$*" | sanitize_output | tee -a "$LOG_FILE"
+}
+# 报告具体失败并停止后续业务。
+die() {
+  log "✖ $*"
+  exit 1
+}
+# 执行外部命令，记录脱敏输出并保留真实退出码。
+run_command() {
+  local result
+  local -a results
+  "$@" 2>&1 | sanitize_output | tee -a "$LOG_FILE"
+  results=("${pipestatus[@]}")
+  for result in "${results[@]}"; do
+    (( result == 0 )) || return "$result"
+  done
+  return 0
+}
+# 让普通写操作显式选择，回车跳过，EOF 终止整个脚本。
+ask_any_to_run() {
+  local answer
+  print -n -r -- "$1（回车跳过；输入任意字符执行）："
+  IFS= read -r answer || die '输入结束，已停止。'
+  [[ -n "$answer" ]]
+}
+# 保护危险操作，只有精确大写 YES 授权。
+confirm_yes() {
+  local answer
+  print -n -r -- "⚠ $1（输入 YES 执行，其它输入取消）："
+  IFS= read -r answer || die '输入结束，已停止。'
+  [[ "$answer" == YES ]]
+}
+# 解析 Finder 拖入的多个带引号或反斜杠路径，不求值执行输入。
+read_paths() {
+  local raw word
+  local -a words
+  print -n -r -- "$1"
+  IFS= read -r raw || die '输入结束，已停止。'
+  words=("${(@z)raw}")
+  PATH_INPUTS=()
+  PATH_INPUT_RAW=()
+  for word in "${words[@]}"; do
+    word="${(Q)word}"
+    word="${word%$'\r'}"
+    [[ "$word" != '~/'* ]] || word="$HOME/${word#\~/}"
+    if [[ -n "$word" ]]; then
+      PATH_INPUT_RAW+=("${word:a}")
+      PATH_INPUTS+=("${word:A}")
+    fi
+  done
+}
+# 在传输前说明对象、真实来源配置和目标。
+show_source() {
+  log "━━━━━━━━━━ 来源｜$1 ━━━━━━━━━━"
+  log "对象：$2"
+  log "来源：$3"
+  log "目标：$4"
+  log '━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+}
 # 输出安装诊断，避免混入返回的命令路径。
 jobs_brew_note() {
-  print -u2 -r -- "ℹ $*"
+  log "ℹ $*" >&2
 }
 # 验证候选能够执行；共享安装只读不代表未安装。
 jobs_brew_candidate_ok() {
@@ -71,8 +173,9 @@ jobs_brew_install_system() {
   local installer system_prefix="$(jobs_brew_system_prefix)" installer_result=0
   command -v curl >/dev/null 2>&1 || { jobs_brew_note "缺少 curl，无法获取官方安装器。"; return 1; }
   installer="$(mktemp "${TMPDIR:-/tmp}/jobs-homebrew-install.XXXXXX")" || return 1
-  if curl -fsSL --connect-timeout 10 --max-time 120 https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o "$installer"; then
-    /bin/bash "$installer" || installer_result=$?
+  show_source 下载 Homebrew安装器 https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh "$installer"
+  if run_command curl -fsSL --connect-timeout 10 --max-time 120 https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o "$installer"; then
+    run_command /bin/bash "$installer" || installer_result=$?
   else
     installer_result=1
   fi
@@ -101,14 +204,16 @@ jobs_brew_install_user() {
   export HOMEBREW_NO_SUDO=1
   mkdir -p "${prefix:h}" || return 1
   stage="$(mktemp -d "${prefix:h}/.jobs-homebrew.XXXXXX")" || return 1
-  if ! curl -fsSL --connect-timeout 10 --max-time 60 https://api.github.com/repos/Homebrew/brew/releases/latest -o "$stage/release.json"; then
+  show_source 下载 Homebrew稳定版 https://api.github.com/repos/Homebrew/brew/releases/latest "$stage/release.json"
+  if ! run_command curl -fsSL --connect-timeout 10 --max-time 60 https://api.github.com/repos/Homebrew/brew/releases/latest -o "$stage/release.json"; then
     rm -r -- "$stage"
     jobs_brew_note "获取官方稳定版本失败，停止安装。"
     return 1
   fi
   release_tag="$(sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([0-9][0-9.]*\)".*/\1/p' "$stage/release.json" | head -n 1)"
+  show_source 克隆 "Homebrew $release_tag" https://github.com/Homebrew/brew.git "$prefix"
   if [[ ! "$release_tag" =~ '^[0-9]+\.[0-9]+\.[0-9]+$' ]] ||
-     ! GIT_TERMINAL_PROMPT=0 "$git_bin" -c http.lowSpeedLimit=1 -c http.lowSpeedTime=60 clone --depth 1 --branch "$release_tag" --single-branch https://github.com/Homebrew/brew.git "$stage/brew" ||
+     ! run_command env GIT_TERMINAL_PROMPT=0 "$git_bin" -c http.lowSpeedLimit=1 -c http.lowSpeedTime=60 clone --depth 1 --branch "$release_tag" --single-branch https://github.com/Homebrew/brew.git "$stage/brew" ||
      ! "$git_bin" -C "$stage/brew" checkout -b stable ||
      ! "$git_bin" -C "$stage/brew" config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*' ||
      ! mkdir -p "$stage/brew/Cellar" "$stage/brew/Caskroom" "$stage/brew/etc" "$stage/brew/var"; then
@@ -129,33 +234,6 @@ jobs_brew_install_user() {
   typeset -g JOBS_HOMEBREW_BIN="$prefix/bin/brew"
   jobs_brew_candidate_ok "$JOBS_HOMEBREW_BIN" || { jobs_brew_note "用户目录安装后复检失败：$prefix"; return 1; }
 }
-# 只更新本模块的 shellenv 配置块，并保留配置文件的符号链接和权限。
-jobs_brew_save_shellenv() {
-  local profile_file="$HOME/.zprofile" profile_stage shellenv_line current_shell="${SHELL:-/bin/zsh}"
-  [[ "${current_shell##*/}" != bash ]] || profile_file="$HOME/.bash_profile"
-  shellenv_line='eval "$('"${(q)JOBS_HOMEBREW_BIN}"' shellenv)"'
-  profile_stage="$(mktemp "${TMPDIR:-/tmp}/jobs-homebrew-profile.XXXXXX")" || return 1
-  if [[ -e "$profile_file" || -L "$profile_file" ]]; then
-    awk '
-      $0 == "# >>> Jobs Homebrew shellenv >>>" { inside = 1; block = $0 ORS; next }
-      inside {
-        block = block $0 ORS
-        if ($0 == "# <<< Jobs Homebrew shellenv <<<") { inside = 0; block = "" }
-        next
-      }
-      { print }
-      END { if (inside) printf "%s", block }
-    ' "$profile_file" > "$profile_stage" || { rm -- "$profile_stage"; return 1; }
-  fi
-  {
-    print -r -- '# >>> Jobs Homebrew shellenv >>>'
-    print -rl -- "$shellenv_line" '# <<< Jobs Homebrew shellenv <<<'
-  } >> "$profile_stage"
-  if ! cmp -s "$profile_stage" "$profile_file"; then
-    cat "$profile_stage" > "$profile_file" || { rm -- "$profile_stage"; jobs_brew_note "无法写入用户配置：$profile_file"; return 1; }
-  fi
-  rm -- "$profile_stage"
-}
 # 激活当前进程并验证 Ruby 命令层；只有新安装才持久化 shellenv。
 jobs_brew_activate() {
   local brew_env
@@ -169,17 +247,14 @@ jobs_brew_activate() {
     if [[ "${JOBS_HOMEBREW_INSTALL_MODE:-}" == user && -z "${HOMEBREW_CASK_OPTS:-}" ]]; then
       export HOMEBREW_CASK_OPTS="--appdir=$HOME/Applications"
     fi
-    jobs_brew_save_shellenv || return 1
+    jobs_brew_note "Homebrew 当前进程已生效；独立工具未写 Shell 配置，后续运行会重新发现此前选择的安装位置。"
   fi
 }
 # 在原版安装位置复用或安装 Homebrew，安装失败必须终止外层业务。
 jobs_brew_install_or_exit() {
   local installed=""
-  if [[ "${DRY_RUN:-0}" == 1 ]]; then
-    jobs_brew_note "演练：Homebrew 系统路径 $(jobs_brew_system_prefix)；用户路径 ${JOBS_HOMEBREW_INSTALL_PREFIX:-$HOME/.local/homebrew}；未询问或执行安装。"
-    return 0
-  fi
   if ! JOBS_HOMEBREW_BIN="$(jobs_brew_find)"; then
+    ask_any_to_run "Homebrew 不可用，安装或修复" || die "Homebrew 未就绪，停止下游业务。"
     jobs_brew_choose_installation || exit 1
     case "$JOBS_HOMEBREW_INSTALL_MODE" in
       system) jobs_brew_install_system || exit 1 ;;
@@ -187,71 +262,91 @@ jobs_brew_install_or_exit() {
       *) jobs_brew_note "安装路径选择无效，停止。"; exit 1 ;;
     esac
     installed=installed
+    log "✔ Homebrew 来源：https://github.com/Homebrew/brew；安装位置：$JOBS_HOMEBREW_BIN"
   fi
   jobs_brew_activate "$installed" || exit 1
 }
-# <<< Jobs Homebrew install choice <<<
-show_script_intro_and_wait() {
-  print -r -- '============================== 脚本内置自述 =============================='
-  print -r -- '脚本名称：【MacOS】下载网页中无法下载的视频.sh'
-  print -r -- '核心用途：执行“下载网页中无法下载的视频”对应的自动化任务。'
-  print -r -- '影响范围：可能修改当前项目、用户环境或脚本指定的目标。'
-  print -r -- '取消方式：确认前按 Ctrl+C 终止，不会继续执行后续业务。'
-  print -r -- '============================================================================'
-  if [[ ! -t 0 ]]; then
-    print -u2 -r -- '当前没有可交互输入，请在终端中重新运行。'
-    exit 1
+# 使用各工具真实支持的版本命令验证健康，Go 使用子命令 version。
+tool_is_healthy() {
+  local tool="$1" candidate="$2"
+  [[ -n "$candidate" && -x "$candidate" ]] || return 1
+  case "$tool" in
+    go) "$candidate" version >/dev/null 2>&1 && command -v gofmt >/dev/null 2>&1 && gofmt -h >/dev/null 2>&1 ;;
+    *) "$candidate" --version >/dev/null 2>&1 ;;
+  esac
+}
+# 按健康状态和显式选择安装或升级当前业务依赖，不更新其它软件。
+ensure_formula_tool() {
+  local tool="$1" formula="$2" candidate
+  candidate="$(command -v "$tool" 2>/dev/null || true)"
+  if tool_is_healthy "$tool" "$candidate"; then
+    log "✔ 已复用健康工具：$candidate"
+    if ask_any_to_run "升级 Homebrew 管理的 $formula"; then
+      "$JOBS_HOMEBREW_BIN" list --versions "$formula" >/dev/null 2>&1 || die "$tool 来自其它来源，请使用原安装方式升级。"
+      show_source 升级 "$formula" 'Homebrew 当前配置的软件源（最终下载地址由 brew 解析）' "$JOBS_HOMEBREW_PREFIX"
+      run_command "$JOBS_HOMEBREW_BIN" upgrade "$formula" || die "$formula 升级失败。"
+    fi
+  else
+    ask_any_to_run "安装或修复 $formula" || die "$tool 未就绪，已停止。"
+    show_source 安装 "$formula" 'Homebrew 当前配置的软件源（最终下载地址由 brew 解析）' "$JOBS_HOMEBREW_PREFIX"
+    if "$JOBS_HOMEBREW_BIN" list --versions "$formula" >/dev/null 2>&1; then
+      run_command "$JOBS_HOMEBREW_BIN" reinstall "$formula" || die "$formula 修复失败。"
+    else
+      run_command "$JOBS_HOMEBREW_BIN" install "$formula" || die "$formula 安装失败。"
+    fi
   fi
-  read -r "?👉 已了解脚本用途与影响，按回车继续；按 Ctrl+C 取消：" _ || exit 1
+  rehash
+  candidate="$(command -v "$tool" 2>/dev/null || true)"
+  tool_is_healthy "$tool" "$candidate" || die "$tool 安装后健康复检失败。"
 }
-# 执行入口下沉后的完整业务流程和控制逻辑。
-run_main_business_flow() {
-# 检查安装 brew
-if ! command -v brew &> /dev/null
-then
-    # 输出当前步骤的提示或执行进度。
-    echo "brew 未安装，开始安装..."
-    # 执行当前流程中的独立业务步骤：open。
-    open https://brew.sh/
-    # 执行当前流程中的独立业务步骤：处理当前语句。
-    jobs_brew_install_or_exit
-    ## brew环境变量设置
-    # 安装帮助函数已按用户选择持久化实际 shellenv。
-    # 执行当前流程中的独立业务步骤：open。
-    open /Users/$(whoami)/.zprofile
-    # 执行当前流程中的独立业务步骤：eval。
-    eval "$("${JOBS_HOMEBREW_BIN:-$(jobs_brew_find)}" shellenv)"
-else
-    # 输出当前步骤的提示或执行进度。
-    echo "brew 已经安装，跳过安装步骤。"
-    ## brew 升级
-    brew update
-    # 执行当前流程中的独立业务步骤：brew。
-    brew doctor
-    # 执行当前流程中的独立业务步骤：brew。
-    brew -v
-fi
-# 检查安装 you-get
-if [[ $(command -v you-get) ]]; then
-  # 输出当前步骤的提示或执行进度。
-  echo "you-get is already installed."
-else
-  # 输出当前步骤的提示或执行进度。
-  echo "you-get is not installed. Installing..."
-  # https://you-get.org/
-  brew install you-get
-fi
-
-# 收集用户输入，供后续业务判断使用。
-read "?请输入视频源,以回车结束:" videoSource
-# 执行当前流程中的独立业务步骤：You。
-You-get $videoSource
+# 收集网页地址和输出目录，参数模式仍保留自述确认。
+collect_video_request() {
+  (( $# <= 2 )) || die '用法：脚本 [网页URL] [输出目录]'
+  VIDEO_URL="${1:-}"
+  if [[ -z "$VIDEO_URL" ]]; then
+    IFS= read -r 'VIDEO_URL?请输入视频网页 URL：' || die '输入结束，已停止。'
+  fi
+  [[ "$VIDEO_URL" =~ '^https?://[^/[:space:]]+(/[^[:space:]]*)?$' ]] || die '网页地址须为完整 HTTP / HTTPS URL。'
+  if [[ -n "${2:-}" ]]; then
+    OUTPUT_DIR="${2:A}"
+  else
+    read_paths '下载目录（回车使用脚本目录下 Downloads）：'
+    (( ${#PATH_INPUTS} <= 1 )) || die '只能指定一个输出目录。'
+    OUTPUT_DIR="${PATH_INPUTS[1]:-$SCRIPT_DIR/Downloads}"
+  fi
+  [[ ! -e "$OUTPUT_DIR" || -d "$OUTPUT_DIR" ]] || die '输出目标不是目录。'
 }
-# 编排脚本的高层业务流程。
+# 在实际使用前验证完整依赖链，健康依赖不自动升级。
+prepare_video_environment() {
+  jobs_brew_install_or_exit
+  ensure_formula_tool you-get you-get
+  if ! command -v ffmpeg >/dev/null 2>&1 || ! ffmpeg -version >/dev/null 2>&1; then
+    if ask_any_to_run '安装 ffmpeg 以支持视频合并'; then
+      show_source 安装 ffmpeg 'Homebrew 当前配置的软件源' "$JOBS_HOMEBREW_PREFIX"
+      local action=install
+      "$JOBS_HOMEBREW_BIN" list --versions ffmpeg >/dev/null 2>&1 && action=reinstall
+      run_command "$JOBS_HOMEBREW_BIN" "$action" ffmpeg || die 'ffmpeg 安装或修复失败。'
+      rehash
+      ffmpeg -version >/dev/null 2>&1 || die 'ffmpeg 安装后复检失败。'
+    else
+      log '⚠ 未准备 ffmpeg，需要媒体合并的站点可能失败。'
+    fi
+  fi
+}
+# 下载媒体并将真实失败返回给调用方，日志隐藏 URL 查询与认证字段。
+download_video() {
+  mkdir -p "$OUTPUT_DIR" || die "输出目录不可写：$OUTPUT_DIR"
+  show_source 下载 '网页媒体（you-get）' "$VIDEO_URL" "$OUTPUT_DIR"
+  run_command you-get --output-dir "$OUTPUT_DIR" "$VIDEO_URL" || die '下载失败；查看日志，部分文件已保留。'
+  log "✔ 下载命令成功；来源：$VIDEO_URL；目录：$OUTPUT_DIR"
+}
+# 编排自述、初始化和独立业务步骤。
 main() {
-  show_script_intro_and_wait # 展示脚本内置自述，并按运行入口完成防误触确认。
-  prepare_homebrew_runtime # 在原业务前确认 Homebrew 健康可用。
-  run_main_business_flow "$@" # 执行入口下沉后的完整业务流程。
+  show_script_intro_and_wait # 先展示用途与影响，确认前不写入。
+  initialize_script_runtime # 确认后初始化选项与日志。
+  collect_video_request "$@" # 校验 URL 和输出目录，非法输入不触发依赖安装。
+  prepare_video_environment # 验证 Homebrew、you-get 和可选合并依赖。
+  download_video # 显示脱敏来源，下载并保留真实退出码。
 }
 
 main "$@"
