@@ -23,10 +23,10 @@
 & ./Regression.ps1
 ```
 
-`-SkipEntrypoints` 只运行模块夹具。完整检查为 35 项断言，覆盖精确 `YES`、BOM、祖先链接拒绝、重建取消、旧容器改名失败、创建失败时恢复原名称与运行状态、保留数据卷，以及全部 15 个入口的 `-Check`。
+`-SkipEntrypoints` 只运行模块夹具。macOS 完整检查为 35 项断言，Windows 为 33 项，覆盖精确 `YES`、BOM、祖先链接拒绝、重建取消、旧容器改名失败、创建失败时恢复原名称与运行状态、保留数据卷，以及全部 15 个入口的 `-Check`。
 
 ## <span id="jobs-toc-heading-2" data-jobs-toc="v2">二、隔离边界 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-[**Docker**](https://docs.docker.com/) 交互由假函数记录，用户配置与安装器不调用。只在唯一临时目录读写；macOS 上执行的链接夹具不替代 Windows 目录联接实机验收。Windows PowerShell 5.1、CMD、WSL2 和真实服务另验。
+[**Docker**](https://docs.docker.com/) 交互由假函数记录，用户配置与安装器不调用。只在唯一临时目录读写；macOS 上执行的链接夹具不替代 Windows 目录联接实机验收。2026-10-26 在 Windows 11 ARM64 / Windows PowerShell 5.1.26100.9711 原生通过 33 项；根 CMD 回归另验证 GoProject 入口在无继承进程执行策略时的真实 `-Check`。WSL2、Docker 和真实服务业务仍需单独验收。
 
 <a id="🔚" href="#前言" style="font-size:17px; color:green; font-weight:bold;">我是有底线的➤点我回到首页</a>
