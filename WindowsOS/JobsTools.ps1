@@ -31,7 +31,14 @@ function Require-JobsCommand([string]$Name) {
 function Get-JobsPath([string]$Prompt, [switch]$Directory, [switch]$AllowNew) {
     $raw = (Read-JobsText $Prompt).Trim().Trim('"')
     if ([string]::IsNullOrWhiteSpace($raw)) { throw '路径不能为空。' }
-    $full = [IO.Path]::GetFullPath([Environment]::ExpandEnvironmentVariables($raw))
+    # 路径内部的 %TEMP% 等可为合法文件名，仅显式环境变量根允许展开。
+    if (!(Test-Path -LiteralPath $raw) -and $raw -match '^%([^%\\/]+)%([\\/].*|$)') {
+        $variable = $Matches[1]; $suffix = $Matches[2]
+        $base = [Environment]::GetEnvironmentVariable($variable, 'Process')
+        if ([string]::IsNullOrEmpty($base)) { throw "环境变量未设置：$variable" }
+        $raw = $base + $suffix
+    }
+    $full = [IO.Path]::GetFullPath($raw)
     $ancestor = $full
     while ($ancestor) {
         if (Test-Path -LiteralPath $ancestor) {

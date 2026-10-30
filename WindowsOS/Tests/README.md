@@ -23,7 +23,7 @@
 & ./Regression.ps1
 ```
 
-`-SkipEntrypoints` 只运行模块夹具。macOS 完整检查为 35 项断言，Windows 为 33 项，覆盖精确 `YES`、BOM、祖先链接拒绝、重建取消、旧容器改名失败、创建失败时恢复原名称与运行状态、保留数据卷，以及全部 15 个入口的 `-Check`。
+`-SkipEntrypoints` 只运行模块夹具。macOS 完整检查为 39 项断言，Windows 为 37 项，覆盖精确 `YES`、BOM、祖先链接拒绝、路径内 `%TEMP%` 字面保留、显式环境变量根与缺变量停止、重建取消、旧容器改名失败、创建失败时恢复原名称与运行状态、保留数据卷，以及全部 15 个入口的 `-Check`。
 
 ## <span id="jobs-toc-heading-2" data-jobs-toc="v2">二、隔离边界 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 

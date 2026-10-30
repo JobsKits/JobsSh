@@ -29,6 +29,19 @@ try{
             $script:answer=Join-Path $link 'old.txt';Assert-Throws {Get-JobsPath '夹具'} '拒绝链接祖先的既有文件'
             $script:answer=Join-Path $link 'new.txt';Assert-Throws {Get-JobsPath '夹具' -AllowNew} '拒绝链接祖先的新目标'
         }
+        $literal=Join-Path $fixture 'literal %TEMP% [path].txt';Write-JobsUtf8 $literal 'keep'
+        $script:answer=$literal;Assert-Equal (Get-JobsPath '夹具') $literal '已有路径中的环境变量字面量保持'
+        $newLiteral=Join-Path $fixture 'new %TEMP% [path].txt'
+        $script:answer=$newLiteral;Assert-Equal (Get-JobsPath '夹具' -AllowNew) $newLiteral '新目标路径中的环境变量字面量保持'
+        $savedPathRoot=[Environment]::GetEnvironmentVariable('JOBS_REGRESSION_PATH_ROOT','Process')
+        try{
+            [Environment]::SetEnvironmentVariable('JOBS_REGRESSION_PATH_ROOT',$fixture,'Process')
+            $script:answer='%JOBS_REGRESSION_PATH_ROOT%'+[IO.Path]::DirectorySeparatorChar+'literal %TEMP% [path].txt'
+            Assert-Equal (Get-JobsPath '夹具') $literal '显式环境变量根仅展开首段'
+            [Environment]::SetEnvironmentVariable('JOBS_REGRESSION_PATH_ROOT',$null,'Process')
+            $script:answer='%JOBS_REGRESSION_PATH_ROOT%'+[IO.Path]::DirectorySeparatorChar+'missing.txt'
+            Assert-Throws {Get-JobsPath '夹具' -AllowNew} '未设置环境变量根停止'
+        }finally{[Environment]::SetEnvironmentVariable('JOBS_REGRESSION_PATH_ROOT',$savedPathRoot,'Process')}
         function Require-JobsDocker{return 'fixture-docker'}
         function Get-JobsMySQLInfo([string]$Docker){return [pscustomobject]@{State=[pscustomobject]@{Running=$true};Mounts=@()}}
         $script:calls=New-Object 'Collections.Generic.List[string]'
