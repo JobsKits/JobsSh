@@ -50,110 +50,110 @@ CMD 转发关闭继承的延迟展开，保留路径和参数中的 `!`，并为
 
 ## <span id="jobs-toc-heading-3" data-jobs-toc="v2">二、入口与流程 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-### <span id="jobs-toc-heading-4" data-jobs-toc="v2">[【WindowsOS】MySQL管理.cmd](<./【WindowsOS】MySQL管理.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-4" data-jobs-toc="v2">[【WindowsOS】MySQL管理.cmd](<./【WindowsOS】MySQL管理.ps1/【WindowsOS】MySQL管理.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** MySQL安装与管理。
 
 - 用[**Docker**](https://docs.docker.com/)官方[**MySQL**](https://www.mysql.com/) `mysql:8.4`替代[**Homebrew**](https://brew.sh/)服务，支持install / start / stop / status / login / logs。首次创建专属容器与独立持久数据卷，回环3306，正常安装要求至少8字符root密码；密码不记日志，但Docker环境变量仍由有权操作Docker的用户可见。ping健康与实际认证分开；login使用交互密码。
-- [PowerShell入口](<./【WindowsOS】MySQL管理.ps1>)；只读检查：`& .\【WindowsOS】MySQL管理.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】MySQL管理.ps1/【WindowsOS】MySQL管理.ps1>)；只读检查：`& .\【WindowsOS】MySQL管理.ps1\【WindowsOS】MySQL管理.ps1 -Check`。
 
-### <span id="jobs-toc-heading-5" data-jobs-toc="v2">[【WindowsOS】MySQL配置.cmd](<./【WindowsOS】MySQL配置.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-5" data-jobs-toc="v2">[【WindowsOS】MySQL配置.cmd](<./【WindowsOS】MySQL配置.ps1/【WindowsOS】MySQL配置.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** MySQL配置。
 
 - 选择已编辑my.cnf，使用同版官方镜像隔离 --validate-config；核对本工具容器与挂载，YES后备份、写入并按原运行状态重启。健康检查失败恢复原配置；不处理其它MySQL实例。
-- [PowerShell入口](<./【WindowsOS】MySQL配置.ps1>)；只读检查：`& .\【WindowsOS】MySQL配置.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】MySQL配置.ps1/【WindowsOS】MySQL配置.ps1>)；只读检查：`& .\【WindowsOS】MySQL配置.ps1\【WindowsOS】MySQL配置.ps1 -Check`。
 
-### <span id="jobs-toc-heading-6" data-jobs-toc="v2">[【WindowsOS】MySQL重建空密码.cmd](<./【WindowsOS】MySQL重建空密码.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-6" data-jobs-toc="v2">[【WindowsOS】MySQL重建空密码.cmd](<./【WindowsOS】MySQL重建空密码.ps1/【WindowsOS】MySQL重建空密码.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** 保留旧数据并重建空密码。
 
 - YES后停止并改名保留旧容器和旧卷，再创建全新数据卷/空密码MySQL，仅回环3306。实连验证root空密码；失败移除本次新容器、恢复旧名称及原运行状态，数据卷不删除；停止成功但改名失败也恢复原运行状态。仅供本机测试。
-- [PowerShell入口](<./【WindowsOS】MySQL重建空密码.ps1>)；只读检查：`& .\【WindowsOS】MySQL重建空密码.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】MySQL重建空密码.ps1/【WindowsOS】MySQL重建空密码.ps1>)；只读检查：`& .\【WindowsOS】MySQL重建空密码.ps1\【WindowsOS】MySQL重建空密码.ps1 -Check`。
 
-### <span id="jobs-toc-heading-7" data-jobs-toc="v2">[【WindowsOS】MySQL卸载.cmd](<./【WindowsOS】MySQL卸载.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-7" data-jobs-toc="v2">[【WindowsOS】MySQL卸载.cmd](<./【WindowsOS】MySQL卸载.ps1/【WindowsOS】MySQL卸载.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** 卸载MySQL容器。
 
 - 核对本工具专属容器标签，YES后停止移除，默认保留全部数据卷。只有再次输入完整专属卷名并YES，才删除该单个卷；Docker发现卷被使用时拒绝删除。
-- [PowerShell入口](<./【WindowsOS】MySQL卸载.ps1>)；只读检查：`& .\【WindowsOS】MySQL卸载.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】MySQL卸载.ps1/【WindowsOS】MySQL卸载.ps1>)；只读检查：`& .\【WindowsOS】MySQL卸载.ps1\【WindowsOS】MySQL卸载.ps1 -Check`。
 
-### <span id="jobs-toc-heading-8" data-jobs-toc="v2">[【WindowsOS】GoProject.cmd](<./【WindowsOS】GoProject.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-8" data-jobs-toc="v2">[【WindowsOS】GoProject.cmd](<./【WindowsOS】GoProject.ps1/【WindowsOS】GoProject.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** Gin工程生成。
 
 - 可选install经[**winget**](https://learn.microsoft.com/windows/package-manager/winget/)安装/升级GoLang.Go；检查[**Go**](https://go.dev/) `go.exe`，输入父目录、工程名与module；拒绝覆盖，确认后创建main.go与go.mod，生成回环8080的/ping路由。另选YES才下载Gin依赖、go test，校验成功才可前台运行；Go缺失可用winget安装GoLang.Go。
-- [PowerShell入口](<./【WindowsOS】GoProject.ps1>)；只读检查：`& .\【WindowsOS】GoProject.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】GoProject.ps1/【WindowsOS】GoProject.ps1>)；只读检查：`& .\【WindowsOS】GoProject.ps1\【WindowsOS】GoProject.ps1 -Check`。
 
-### <span id="jobs-toc-heading-9" data-jobs-toc="v2">[【WindowsOS】HEIC2Jpg.cmd](<./【WindowsOS】HEIC2Jpg.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-9" data-jobs-toc="v2">[【WindowsOS】HEIC2Jpg.cmd](<./【WindowsOS】HEIC2Jpg.ps1/【WindowsOS】HEIC2Jpg.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** HEIC转换JPEG。
 
 - 可选install经winget安装/升级ImageMagick；使用支持HEIC的[**ImageMagick**](https://imagemagick.org/) `magick.exe`，扫描选择目录第一层HEIC，YES后输出JPEG子目录。保留原图，已有目标跳过，临时转换成功才发布，失败汇总非零退出；可用winget安装ImageMagick.ImageMagick。
-- [PowerShell入口](<./【WindowsOS】HEIC2Jpg.ps1>)；只读检查：`& .\【WindowsOS】HEIC2Jpg.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】HEIC2Jpg.ps1/【WindowsOS】HEIC2Jpg.ps1>)；只读检查：`& .\【WindowsOS】HEIC2Jpg.ps1\【WindowsOS】HEIC2Jpg.ps1 -Check`。
 
-### <span id="jobs-toc-heading-10" data-jobs-toc="v2">[【WindowsOS】Java环境配置.cmd](<./【WindowsOS】Java环境配置.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-10" data-jobs-toc="v2">[【WindowsOS】Java环境配置.cmd](<./【WindowsOS】Java环境配置.ps1/【WindowsOS】Java环境配置.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** Java检查与用户配置。
 
 - check实际检查[**Java**](https://www.java.com/) `java/javac`；install通过winget安装Eclipse Temurin21。configure选择JDK后备份用户JAVA_HOME/Path并YES持久设置；restore核对没有后续修改再恢复，不修改系统变量。安装后重开终端复检。
-- [PowerShell入口](<./【WindowsOS】Java环境配置.ps1>)；只读检查：`& .\【WindowsOS】Java环境配置.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】Java环境配置.ps1/【WindowsOS】Java环境配置.ps1>)；只读检查：`& .\【WindowsOS】Java环境配置.ps1\【WindowsOS】Java环境配置.ps1 -Check`。
 
-### <span id="jobs-toc-heading-11" data-jobs-toc="v2">[【WindowsOS】PHP与Apache.cmd](<./【WindowsOS】PHP与Apache.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-11" data-jobs-toc="v2">[【WindowsOS】PHP与Apache.cmd](<./【WindowsOS】PHP与Apache.ps1/【WindowsOS】PHP与Apache.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** PHP与Apache服务。
 
 - 使用Docker官方php:8.4-apache，支持install / start / stop / status / logs / remove。只读挂载选定网站目录，回环8082，检查Apache配置与HTTP响应；停止移除保留网站文件。网站目录需提供可访问首页。
-- [PowerShell入口](<./【WindowsOS】PHP与Apache.ps1>)；只读检查：`& .\【WindowsOS】PHP与Apache.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】PHP与Apache.ps1/【WindowsOS】PHP与Apache.ps1>)；只读检查：`& .\【WindowsOS】PHP与Apache.ps1\【WindowsOS】PHP与Apache.ps1 -Check`。
 
-### <span id="jobs-toc-heading-12" data-jobs-toc="v2">[【WindowsOS】Tomcat.cmd](<./【WindowsOS】Tomcat.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-12" data-jobs-toc="v2">[【WindowsOS】Tomcat.cmd](<./【WindowsOS】Tomcat.ps1/【WindowsOS】Tomcat.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** Tomcat服务。
 
 - 使用Docker官方tomcat:10.1-jdk21-temurin，支持install / start / stop / status / logs / remove。将选择的webapps内容复制到独立持久数据卷，支持WAR自动展开并保留主机源文件，回环8083，catalina version复检后等待首页；需提供ROOT应用首页，否则HTTP404会如实报告未就绪。移除容器保留部署数据卷。
-- [PowerShell入口](<./【WindowsOS】Tomcat.ps1>)；只读检查：`& .\【WindowsOS】Tomcat.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】Tomcat.ps1/【WindowsOS】Tomcat.ps1>)；只读检查：`& .\【WindowsOS】Tomcat.ps1\【WindowsOS】Tomcat.ps1 -Check`。
 
-### <span id="jobs-toc-heading-13" data-jobs-toc="v2">[【WindowsOS】网页视频下载.cmd](<./【WindowsOS】网页视频下载.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-13" data-jobs-toc="v2">[【WindowsOS】网页视频下载.cmd](<./【WindowsOS】网页视频下载.ps1/【WindowsOS】网页视频下载.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** 网页视频下载。
 
 - download检查用户Python、验证HTTP/HTTPS地址并选择输出目录，显示脱敏来源，YES后运行python -m you_get；install经YES通过用户pip安装/升级you-get。仅下载本人有权使用的媒体，需要合并时先准备ffmpeg.exe。
-- [PowerShell入口](<./【WindowsOS】网页视频下载.ps1>)；只读检查：`& .\【WindowsOS】网页视频下载.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】网页视频下载.ps1/【WindowsOS】网页视频下载.ps1>)；只读检查：`& .\【WindowsOS】网页视频下载.ps1\【WindowsOS】网页视频下载.ps1 -Check`。
 
-### <span id="jobs-toc-heading-14" data-jobs-toc="v2">[【WindowsOS】RubyGems.cmd](<./【WindowsOS】RubyGems.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-14" data-jobs-toc="v2">[【WindowsOS】RubyGems.cmd](<./【WindowsOS】RubyGems.ps1/【WindowsOS】RubyGems.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** RubyGems检查与维护。
 
 - 显示[**RubyGems**](https://rubygems.org/)版本与当前软件源，支持status / source / update / cleanup。软件源只从官方或Ruby China二选一，先备份.gemrc再YES修改；更新RubyGems/Gem和清理旧版本分别确认；DevKit/编译器由既有RubyInstaller环境提供。
-- [PowerShell入口](<./【WindowsOS】RubyGems.ps1>)；只读检查：`& .\【WindowsOS】RubyGems.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】RubyGems.ps1/【WindowsOS】RubyGems.ps1>)；只读检查：`& .\【WindowsOS】RubyGems.ps1\【WindowsOS】RubyGems.ps1 -Check`。
 
-### <span id="jobs-toc-heading-15" data-jobs-toc="v2">[【WindowsOS】Ruby环境升级.cmd](<./【WindowsOS】Ruby环境升级.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-15" data-jobs-toc="v2">[【WindowsOS】Ruby环境升级.cmd](<./【WindowsOS】Ruby环境升级.ps1/【WindowsOS】Ruby环境升级.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** Ruby环境安装升级。
 
 - winget列出RubyInstaller当前目录，由用户复制精确RubyInstallerTeam版本包ID后YES执行安装/升级；不猜测新版本、不覆盖未知Ruby管理器，完成后重开终端验证ruby/gem。
-- [PowerShell入口](<./【WindowsOS】Ruby环境升级.ps1>)；只读检查：`& .\【WindowsOS】Ruby环境升级.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】Ruby环境升级.ps1/【WindowsOS】Ruby环境升级.ps1>)；只读检查：`& .\【WindowsOS】Ruby环境升级.ps1\【WindowsOS】Ruby环境升级.ps1 -Check`。
 
-### <span id="jobs-toc-heading-16" data-jobs-toc="v2">[【WindowsOS】受保护文件追加.cmd](<./【WindowsOS】受保护文件追加.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-16" data-jobs-toc="v2">[【WindowsOS】受保护文件追加.cmd](<./【WindowsOS】受保护文件追加.ps1/【WindowsOS】受保护文件追加.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** 受保护文件追加。
 
 - 选择唯一普通UTF-8文件，输入一行正文；YES后同目录备份，校验无并发改变后追加并保留BOM。内容不写日志；权限不足时停止，需用户自行管理员方式启动，工具不自动提权。
-- [PowerShell入口](<./【WindowsOS】受保护文件追加.ps1>)；只读检查：`& .\【WindowsOS】受保护文件追加.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】受保护文件追加.ps1/【WindowsOS】受保护文件追加.ps1>)；只读检查：`& .\【WindowsOS】受保护文件追加.ps1\【WindowsOS】受保护文件追加.ps1 -Check`。
 
-### <span id="jobs-toc-heading-17" data-jobs-toc="v2">[【WindowsOS】文件扩展名显示.cmd](<./【WindowsOS】文件扩展名显示.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-17" data-jobs-toc="v2">[【WindowsOS】文件扩展名显示.cmd](<./【WindowsOS】文件扩展名显示.ps1/【WindowsOS】文件扩展名显示.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** 资源管理器扩展名显示。
 
 - Windows没有Finder逐文件隐藏扩展名属性。明确展示全局范围后，可hide/show设置当前用户Explorer HideFileExt，YES确认并保存原值；保留真实文件名，不重命名。重新打开资源管理器窗口后查看，运行反向选项恢复。
-- [PowerShell入口](<./【WindowsOS】文件扩展名显示.ps1>)；只读检查：`& .\【WindowsOS】文件扩展名显示.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】文件扩展名显示.ps1/【WindowsOS】文件扩展名显示.ps1>)；只读检查：`& .\【WindowsOS】文件扩展名显示.ps1\【WindowsOS】文件扩展名显示.ps1 -Check`。
 
-### <span id="jobs-toc-heading-18" data-jobs-toc="v2">[【WindowsOS】Docker配置.cmd](<./【WindowsOS】Docker配置.cmd>)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-18" data-jobs-toc="v2">[【WindowsOS】Docker配置.cmd](<./【WindowsOS】Docker配置.ps1/【WindowsOS】Docker配置.cmd>)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** Docker Desktop安装与检查。
 
 - check分别检查CLI与引擎；install经YES用winget安装/升级Docker.DockerDesktop；open确认后启动Desktop。WSL2、虚拟化、许可与重启按官方引导本人完成，不静默改系统功能。
-- [PowerShell入口](<./【WindowsOS】Docker配置.ps1>)；只读检查：`& .\【WindowsOS】Docker配置.ps1 -Check`。
+- [PowerShell入口](<./【WindowsOS】Docker配置.ps1/【WindowsOS】Docker配置.ps1>)；只读检查：`& .\【WindowsOS】Docker配置.ps1\【WindowsOS】Docker配置.ps1 -Check`。
 
 ## <span id="jobs-toc-heading-19" data-jobs-toc="v2">三、平台差异与验证 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 

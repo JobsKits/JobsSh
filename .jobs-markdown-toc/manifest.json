@@ -39,6 +39,24 @@
     "MacOS/【MacOS】Golang.sh/README.md",
     "MacOS/【MacOS】Java.sh/README.md",
     "MacOS/【MacOS】Tomcat.sh/README.md",
-    "WindowsOS/Tests/README.md"
+    "WindowsOS/Tests/README.md",
+    "WindowsOS/【WindowsOS】Docker配置.ps1/README.md",
+    "WindowsOS/【WindowsOS】GoProject.ps1/README.md",
+    "WindowsOS/【WindowsOS】HEIC2Jpg.ps1/README.md",
+    "WindowsOS/【WindowsOS】Java环境配置.ps1/README.md",
+    "WindowsOS/【WindowsOS】MySQL卸载.ps1/README.md",
+    "WindowsOS/【WindowsOS】MySQL管理.ps1/README.md",
+    "WindowsOS/【WindowsOS】MySQL配置.ps1/README.md",
+    "WindowsOS/【WindowsOS】MySQL重建空密码.ps1/README.md",
+    "WindowsOS/【WindowsOS】PHP与Apache.ps1/README.md",
+    "WindowsOS/【WindowsOS】RubyGems.ps1/README.md",
+    "WindowsOS/【WindowsOS】Ruby环境升级.ps1/README.md",
+    "WindowsOS/【WindowsOS】Tomcat.ps1/README.md",
+    "WindowsOS/【WindowsOS】受保护文件追加.ps1/README.md",
+    "WindowsOS/【WindowsOS】文件扩展名显示.ps1/README.md",
+    "WindowsOS/【WindowsOS】网页视频下载.ps1/README.md",
+    "项目相关报告/脚本统一审查.md",
+    "WindowsOS/JobsTools.ps1/README.md",
+    "WindowsOS/Tests/Regression.ps1/README.md"
   ]
 }

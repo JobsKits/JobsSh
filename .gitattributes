@@ -39,6 +39,24 @@
 "/MacOS/\343\200\220MacOS\343\200\221Java.sh/README.md" filter=jobs-markdown-toc
 "/MacOS/\343\200\220MacOS\343\200\221Tomcat.sh/README.md" filter=jobs-markdown-toc
 "/WindowsOS/Tests/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】Docker配置.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】GoProject.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】HEIC2Jpg.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】Java环境配置.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】MySQL卸载.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】MySQL管理.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】MySQL配置.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】MySQL重建空密码.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】PHP与Apache.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】RubyGems.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】Ruby环境升级.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】Tomcat.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】受保护文件追加.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】文件扩展名显示.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/【WindowsOS】网页视频下载.ps1/README.md" filter=jobs-markdown-toc
+"/项目相关报告/脚本统一审查.md" filter=jobs-markdown-toc
+"/WindowsOS/JobsTools.ps1/README.md" filter=jobs-markdown-toc
+"/WindowsOS/Tests/Regression.ps1/README.md" filter=jobs-markdown-toc
 # jobs-markdown-toc:end
 
-"/WindowsOS/*.cmd" text eol=crlf
+"/WindowsOS/**/*.cmd" text eol=crlf

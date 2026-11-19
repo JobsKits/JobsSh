@@ -20,7 +20,7 @@
 在此目录使用 [**PowerShell**](https://learn.microsoft.com/powershell/) 运行：
 
 ```powershell
-& ./Regression.ps1
+& ./Regression.ps1/Regression.ps1
 ```
 
 `-SkipEntrypoints` 只运行模块夹具。macOS 完整检查为 39 项断言，Windows 为 37 项，覆盖精确 `YES`、BOM、祖先链接拒绝、路径内 `%TEMP%` 字面保留、显式环境变量根与缺变量停止、重建取消、旧容器改名失败、创建失败时恢复原名称与运行状态、保留数据卷，以及全部 15 个入口的 `-Check`。
