@@ -264,7 +264,7 @@ try {
 # BEGIN JOBS_TERMINAL_STYLE_ORIGINAL_BODY
 Set-StrictMode -Version 2.0
 $ErrorActionPreference='Stop'
-$root=Split-Path -Parent $PSScriptRoot
+$root=Split-Path -Parent ([IO.Path]::GetDirectoryName($PSScriptRoot))
 $fixture=Join-Path ([IO.Path]::GetTempPath()) ('JobsShTest-'+[guid]::NewGuid().ToString('N'))
 if([Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT){$fixture=Join-Path '/private/tmp' (Split-Path -Leaf $fixture)}
 [void][IO.Directory]::CreateDirectory($fixture)
@@ -275,7 +275,7 @@ function Assert-Equal($Actual,$Expected,[string]$Label){if($Actual -cne $Expecte
 function Assert-Throws([scriptblock]$Body,[string]$Label){$failed=$false;try{& $Body}catch{$failed=$true};if(!$failed){throw "$Label：应当失败"};$script:count++}
 try{
     & {
-        . (Join-Path $root 'JobsTools.ps1')
+        . (Join-Path $root 'JobsTools.ps1/JobsTools.ps1')
         $script:answer=''
         function Read-JobsText([string]$Prompt,[string]$Default=''){return $script:answer}
         foreach($answer in @('','yes','Yes',' YES','YES ')){$script:answer=$answer;Assert-Throws {Confirm-JobsChange '夹具'} '危险操作精确 YES'}
@@ -328,7 +328,7 @@ try{
     }
     if(!$SkipEntrypoints){
         $hostPath=(Get-Process -Id $PID).Path
-        foreach($entry in Get-ChildItem -LiteralPath $root -File -Filter '【WindowsOS】*.ps1'){
+        foreach($entry in Get-ChildItem -LiteralPath $root -File -Filter '【WindowsOS】*.ps1' -Recurse){
             & $hostPath -NoLogo -NoProfile -File $entry.FullName -Check|Out-Null
             Assert-Equal $LASTEXITCODE 0 ('只读入口 '+$entry.Name)
         }
